@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'src/core/resources/app_colors.dart';
+import 'src/features/convert_image/presentation/screens/convert_images/convert_images_screen.dart';
 import 'src/features/convert_image/presentation/screens/select_images/select_images_screen.dart';
 import 'src/features/convert_image/presentation/screens/welcome/welcome_main_screen.dart';
 
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "welcome": (context) => const WelcomeMainScreen(),
         "select_images": (context) => const SelectImagesScreen(),
+        "convert_images": (context) => const ConvertImagesScreen(),
       },
     );
   }
