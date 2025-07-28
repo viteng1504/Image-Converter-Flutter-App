@@ -173,7 +173,7 @@ class _SelectModeState extends State<SelectMode> {
 
   Widget _modeButton(Mode mode, String label) {
     final bool isSelected = _modeSelected == mode;
-    return Flexible(
+    return Expanded(
       flex: 1,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(

@@ -1,0 +1,26 @@
+import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../../../../core/enums/convert_mode.dart';
+import '../../../domain/entities/original_image.dart';
+
+part 'convert_images_state.freezed.dart';
+
+@freezed
+class ConvertImagesState with _$ConvertImagesState {
+  const factory ConvertImagesState({
+    required bool isConvertingImageToBytes,
+    required List<OriginalImage> images,
+    required int compressAmount,
+    required bool isGrayScale,
+    required ConvertMode convertMode,
+  }) = _ConvertImagesState;
+
+  factory ConvertImagesState.initial() => const ConvertImagesState(
+    isConvertingImageToBytes: false,
+    images: [],
+    compressAmount: 0,
+    isGrayScale: false,
+    convertMode: ConvertMode.jpg,
+  );
+}

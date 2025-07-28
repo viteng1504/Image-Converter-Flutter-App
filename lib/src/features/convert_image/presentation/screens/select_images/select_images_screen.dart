@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/resources/app_assets.dart';
+import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
 import '../../../domain/usecases/select_image_usecase.dart';
 import '../../blocs/select_images/select_images_cubit.dart';
@@ -14,9 +15,25 @@ class SelectImagesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create:
-          (context) =>
-              SelectImagesCubit(SelectImageUsecase(ImagesRepositoryImpl())),
-      child: BlocBuilder<SelectImagesCubit, SelectImagesState>(
+          (context) => SelectImagesCubit(
+            SelectImageUsecase(ImagesRepositoryImpl(ConvertApi())),
+          ),
+      child: BlocConsumer<SelectImagesCubit, SelectImagesState>(
+        listener: (context, state) {
+          final images = state.imageXFiles;
+          if (state.isShowSnackBar) {
+            context.read<SelectImagesCubit>().onShowSnackBar(context);
+          }
+
+          if (images.isNotEmpty) {
+            context.read<SelectImagesCubit>().navigateToConvertScreen(
+              context,
+              images,
+            );
+          } else {
+            // print(images[0].bytes);
+          }
+        },
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
@@ -62,7 +79,7 @@ class SelectImagesScreen extends StatelessWidget {
 
             body: InkWell(
               onTap: () {
-                Navigator.pushNamed(context, "convert_images");
+                context.read<SelectImagesCubit>().onSelectImages();
               },
               child: Padding(
                 padding: const EdgeInsets.all(32),

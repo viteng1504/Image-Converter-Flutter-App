@@ -31,7 +31,6 @@ class _ConvertModeButtonState extends State<ConvertModeButton> {
         child: InkWell(
           onTap: widget.onPressed,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             decoration: BoxDecoration(
               color: widget.isSelected ? AppColors.primary : null,
               border:

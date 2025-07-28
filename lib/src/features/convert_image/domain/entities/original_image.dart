@@ -1,5 +1,8 @@
-class OriginalImage {
-  final String image;
+import 'dart:typed_data';
 
-  OriginalImage({required this.image});
+class OriginalImage {
+  final Uint8List bytes;
+  final String name;
+
+  OriginalImage({required this.bytes, required this.name});
 }
