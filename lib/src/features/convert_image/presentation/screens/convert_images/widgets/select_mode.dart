@@ -7,10 +7,12 @@ enum Mode { compress, other }
 class SelectMode extends StatefulWidget {
   final double sliderValue;
   final Function(double) onChanged;
+  final Function(double) onChangedEnd;
   const SelectMode({
     super.key,
     required this.sliderValue,
     required this.onChanged,
+    required this.onChangedEnd,
   });
 
   @override
@@ -98,6 +100,7 @@ class _SelectModeState extends State<SelectMode> {
                   child: Slider(
                     value: widget.sliderValue,
                     onChanged: widget.onChanged,
+                    onChangeEnd: widget.onChangedEnd,
                     min: 0,
                     max: 100,
                     divisions: 100,

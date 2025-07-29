@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../core/device_info.dart';
 import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
@@ -13,6 +16,16 @@ class SelectImagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final logicalSize = MediaQuery.of(context).size;
+    // final pixelRatio = MediaQuery.of(context).devicePixelRatio;
+
+    // final physicalWidth = (logicalSize.width * pixelRatio).round();
+    // final physicalHeight = (logicalSize.height * pixelRatio).round();
+    // print("$physicalWidth x $physicalHeight resolution");
+
+    // DeviceInfo.maxSize = max(physicalWidth, physicalHeight);
+    // print(DeviceInfo.maxSize);
+
     return BlocProvider(
       create:
           (context) => SelectImagesCubit(

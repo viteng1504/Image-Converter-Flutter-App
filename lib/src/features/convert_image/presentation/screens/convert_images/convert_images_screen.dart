@@ -1,5 +1,6 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
@@ -9,7 +10,7 @@ import '../../../../../core/utils/utils.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
 import '../../../domain/entities/original_image.dart';
-import '../../../domain/usecases/select_image_usecase.dart';
+import '../../../domain/usecases/convert_image_usecase.dart';
 import '../../blocs/convert_images/convert_images_cubit.dart';
 import '../../blocs/convert_images/convert_images_state.dart';
 import '../../blocs/convert_images/image_display_cubit.dart';
@@ -28,22 +29,19 @@ class ConvertImagesScreen extends StatefulWidget {
 }
 
 class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
-  double sliderValue = 0;
+  int compressAmount = 0;
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
-    final pixelRatio = mediaQuery.devicePixelRatio;
-    final size = mediaQuery.size;
-    final widthPx = (size.width * pixelRatio).toInt();
-    final heightPx = (size.height * pixelRatio).toInt();
+    final ConvertImageUsecase convertImageUsecase = ConvertImageUsecase(
+      ImagesRepositoryImpl(ConvertApi()),
+    );
 
-    print("Resolution: $widthPx x $heightPx px");
     return BlocProvider(
       create:
-          (context) => ConvertImagesCubit(
-            SelectImageUsecase(ImagesRepositoryImpl(ConvertApi())),
-          )..onConvertImages(widget.images),
+          (context) =>
+              ConvertImagesCubit(convertImageUsecase)
+                ..onConvertImages(widget.images),
       child: BlocConsumer<ConvertImagesCubit, ConvertImagesState>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -69,6 +67,69 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Expanded(
+                      //   child: SingleChildScrollView(
+                      //     child: Column(
+                      //       children:
+                      //           state.images.asMap().entries.map((entry) {
+                      //             final index = entry.key;
+                      //             final originalImage = entry.value;
+
+                      //             final Uint8List bytes = originalImage.bytes;
+                      //             final String size = Utils.formatSize(
+                      //               bytes.length,
+                      //             );
+
+                      //             return BlocProvider(
+                      //               key: ValueKey(
+                      //                 "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
+                      //               ),
+                      //               create:
+                      //                   (context) => ImageDisplayCubit(
+                      //                     convertImageUsecase,
+                      //                   )..convertImage(
+                      //                     bytes: bytes,
+                      //                     compressAmount: state.compressAmount,
+                      //                     isGrayScale: state.isGrayScale,
+                      //                     convertMode: state.convertMode,
+                      //                   ),
+                      //               child: BlocBuilder<
+                      //                 ImageDisplayCubit,
+                      //                 ImageDisplayState
+                      //               >(
+                      //                 builder: (context, imageState) {
+                      //                   return DisplayImage(
+                      //                     bytes: imageState.image,
+                      //                     size:
+                      //                         imageState.size ??
+                      //                         "Loading file size",
+                      //                     isLoadingImage:
+                      //                         imageState.isLoadingImage,
+                      //                     isLoadingSize:
+                      //                         imageState.isLoadingSize,
+                      //                   );
+                      //                 },
+                      //               ),
+                      //             );
+                      //           }).toList(),
+                      //     ),
+                      //   ),
+                      //   // GridView.builder(
+                      //   //   gridDelegate:
+                      //   //       SliverGridDelegateWithFixedCrossAxisCount(
+                      //   //         crossAxisCount:
+                      //   //             widget.images.length == 1 ? 1 : 2,
+                      //   //         mainAxisSpacing: 16,
+                      //   //         crossAxisSpacing: 16,
+                      //   //         childAspectRatio: 0.9,
+                      //   //       ),
+                      //   //   itemCount: widget.images.length,
+                      //   //   itemBuilder: (context, index) {
+
+                      //   //     // return const SizedBox();
+                      //   //   },
+                      //   // ),
+                      // ),
                       Expanded(
                         child: GridView.builder(
                           gridDelegate:
@@ -82,25 +143,36 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                           itemCount: widget.images.length,
                           itemBuilder: (context, index) {
                             final OriginalImage image = state.images[index];
-                            final Uint8List bytes = image.bytes;
-                            final String size = Utils().formatSize(
+                            Uint8List bytes =
+                                state.compressAmount != 0
+                                    ? image.halfSizeImagebytes
+                                    : image.bytes;
+                            final String size = Utils.formatSize(
                               image.bytes.length,
                             );
 
                             return BlocProvider(
+                              key: ValueKey(
+                                "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
+                              ),
                               create:
                                   (context) =>
-                                      ImageDisplayCubit()
-                                        ..loadingImage()
-                                        ..loadingSize(),
+                                      ImageDisplayCubit(convertImageUsecase)
+                                        ..convertImage(
+                                          bytes: bytes,
+                                          compressAmount: state.compressAmount,
+                                          isGrayScale: state.isGrayScale,
+                                          convertMode: state.convertMode,
+                                        ),
                               child: BlocBuilder<
                                 ImageDisplayCubit,
                                 ImageDisplayState
                               >(
-                                builder: (imageContext, imageState) {
+                                builder: (context, imageState) {
                                   return DisplayImage(
-                                    bytes: bytes,
-                                    size: size,
+                                    bytes: imageState.image,
+                                    size:
+                                        imageState.size ?? "Loading file size",
                                     isLoadingImage: imageState.isLoadingImage,
                                     isLoadingSize: imageState.isLoadingSize,
                                   );
@@ -193,11 +265,16 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
 
                       // select mode
                       SelectMode(
-                        sliderValue: sliderValue,
+                        sliderValue: compressAmount.toDouble(),
                         onChanged: (value) {
                           setState(() {
-                            sliderValue = value;
+                            compressAmount = value.toInt();
                           });
+                        },
+                        onChangedEnd: (value) {
+                          context
+                              .read<ConvertImagesCubit>()
+                              .onCompressionAmountChanged(value.toInt());
                         },
                       ),
 

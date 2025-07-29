@@ -14,6 +14,7 @@ class ConvertImagesState with _$ConvertImagesState {
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
+    required List<ConvertImagesState> imageStateList,
   }) = _ConvertImagesState;
 
   factory ConvertImagesState.initial() => const ConvertImagesState(
@@ -22,5 +23,6 @@ class ConvertImagesState with _$ConvertImagesState {
     compressAmount: 0,
     isGrayScale: false,
     convertMode: ConvertMode.jpg,
+    imageStateList: [],
   );
 }

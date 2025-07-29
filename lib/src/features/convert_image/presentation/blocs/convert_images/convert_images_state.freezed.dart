@@ -22,6 +22,8 @@ mixin _$ConvertImagesState {
   int get compressAmount => throw _privateConstructorUsedError;
   bool get isGrayScale => throw _privateConstructorUsedError;
   ConvertMode get convertMode => throw _privateConstructorUsedError;
+  List<ConvertImagesState> get imageStateList =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +45,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
+    List<ConvertImagesState> imageStateList,
   });
 }
 
@@ -66,6 +69,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
+    Object? imageStateList = null,
   }) {
     return _then(
       _value.copyWith(
@@ -94,6 +98,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.convertMode
                     : convertMode // ignore: cast_nullable_to_non_nullable
                         as ConvertMode,
+            imageStateList:
+                null == imageStateList
+                    ? _value.imageStateList
+                    : imageStateList // ignore: cast_nullable_to_non_nullable
+                        as List<ConvertImagesState>,
           )
           as $Val,
     );
@@ -115,6 +124,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
+    List<ConvertImagesState> imageStateList,
   });
 }
 
@@ -137,6 +147,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
+    Object? imageStateList = null,
   }) {
     return _then(
       _$ConvertImagesStateImpl(
@@ -165,6 +176,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value.convertMode
                 : convertMode // ignore: cast_nullable_to_non_nullable
                     as ConvertMode,
+        imageStateList:
+            null == imageStateList
+                ? _value._imageStateList
+                : imageStateList // ignore: cast_nullable_to_non_nullable
+                    as List<ConvertImagesState>,
       ),
     );
   }
@@ -181,7 +197,9 @@ class _$ConvertImagesStateImpl
     required this.compressAmount,
     required this.isGrayScale,
     required this.convertMode,
-  }) : _images = images;
+    required final List<ConvertImagesState> imageStateList,
+  }) : _images = images,
+       _imageStateList = imageStateList;
 
   @override
   final bool isConvertingImageToBytes;
@@ -199,10 +217,17 @@ class _$ConvertImagesStateImpl
   final bool isGrayScale;
   @override
   final ConvertMode convertMode;
+  final List<ConvertImagesState> _imageStateList;
+  @override
+  List<ConvertImagesState> get imageStateList {
+    if (_imageStateList is EqualUnmodifiableListView) return _imageStateList;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_imageStateList);
+  }
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList)';
   }
 
   @override
@@ -219,7 +244,8 @@ class _$ConvertImagesStateImpl
       ..add(DiagnosticsProperty('images', images))
       ..add(DiagnosticsProperty('compressAmount', compressAmount))
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
-      ..add(DiagnosticsProperty('convertMode', convertMode));
+      ..add(DiagnosticsProperty('convertMode', convertMode))
+      ..add(DiagnosticsProperty('imageStateList', imageStateList));
   }
 
   @override
@@ -238,7 +264,11 @@ class _$ConvertImagesStateImpl
             (identical(other.isGrayScale, isGrayScale) ||
                 other.isGrayScale == isGrayScale) &&
             (identical(other.convertMode, convertMode) ||
-                other.convertMode == convertMode));
+                other.convertMode == convertMode) &&
+            const DeepCollectionEquality().equals(
+              other._imageStateList,
+              _imageStateList,
+            ));
   }
 
   @override
@@ -249,6 +279,7 @@ class _$ConvertImagesStateImpl
     compressAmount,
     isGrayScale,
     convertMode,
+    const DeepCollectionEquality().hash(_imageStateList),
   );
 
   /// Create a copy of ConvertImagesState
@@ -270,6 +301,7 @@ abstract class _ConvertImagesState implements ConvertImagesState {
     required final int compressAmount,
     required final bool isGrayScale,
     required final ConvertMode convertMode,
+    required final List<ConvertImagesState> imageStateList,
   }) = _$ConvertImagesStateImpl;
 
   @override
@@ -282,6 +314,8 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   bool get isGrayScale;
   @override
   ConvertMode get convertMode;
+  @override
+  List<ConvertImagesState> get imageStateList;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.

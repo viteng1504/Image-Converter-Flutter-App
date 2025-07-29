@@ -7,7 +7,6 @@ import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../domain/entities/original_image.dart';
 import '../../../domain/usecases/select_image_usecase.dart';
 import '../../screens/convert_images/convert_images_screen.dart';
 import 'select_images_state.dart';
@@ -18,18 +17,8 @@ class SelectImagesCubit extends Cubit<SelectImagesState> {
   SelectImagesCubit(this.selectImageUsecase)
     : super(SelectImagesState.initial());
 
-  void isLoadingFalse() {
-    emit(state.copyWith(isConvertingImageToBytes: false));
-  }
 
-  void resetState() {
-    emit(SelectImagesState.initial());
-    emit(state.copyWith(isResetState: false));
-    print(state.isConvertingImageToBytes);
-    print(state.isResetState);
-    print(state.isShowSnackBar);
-    print(state.images);
-  }
+  
 
   void onShowSnackBar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -53,13 +42,6 @@ class SelectImagesCubit extends Cubit<SelectImagesState> {
         builder: (context) => ConvertImagesScreen(images: images),
       ),
     );
-    emit(
-      state.copyWith(
-        isConvertingImageToBytes: true,
-        images: [],
-        isResetState: true,
-      ),
-    );
     emit(SelectImagesState.initial());
   }
 
@@ -79,13 +61,6 @@ class SelectImagesCubit extends Cubit<SelectImagesState> {
     } else {
       emit(state.copyWith(imageXFiles: images));
     }
-  }
-
-  //encode images
-  Future<List<OriginalImage>> encodeImageList(List<XFile> images) {
-    emit(state.copyWith(isConvertingImageToBytes: true));
-
-    return selectImageUsecase.encodeImage(images);
   }
 
   Future<void> onSelectImageFiles() async {
