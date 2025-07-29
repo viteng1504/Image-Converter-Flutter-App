@@ -36,7 +36,7 @@ class _DisplayImageState extends State<DisplayImage> {
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
               child:
-                  (widget.isLoadingImage || widget.bytes == null)
+                  (widget.isLoadingImage && widget.bytes == null)
                       ? const ColoredBox(
                         color: AppColors.indicatorDot,
                         child: Center(

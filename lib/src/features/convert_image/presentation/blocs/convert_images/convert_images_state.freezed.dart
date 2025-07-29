@@ -19,6 +19,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$ConvertImagesState {
   bool get isConvertingImageToBytes => throw _privateConstructorUsedError;
   List<OriginalImage> get images => throw _privateConstructorUsedError;
+  List<OriginalImage> get halfSizeImages => throw _privateConstructorUsedError;
   int get compressAmount => throw _privateConstructorUsedError;
   bool get isGrayScale => throw _privateConstructorUsedError;
   ConvertMode get convertMode => throw _privateConstructorUsedError;
@@ -42,6 +43,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
   $Res call({
     bool isConvertingImageToBytes,
     List<OriginalImage> images,
+    List<OriginalImage> halfSizeImages,
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
@@ -66,6 +68,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
   $Res call({
     Object? isConvertingImageToBytes = null,
     Object? images = null,
+    Object? halfSizeImages = null,
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
@@ -82,6 +85,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                 null == images
                     ? _value.images
                     : images // ignore: cast_nullable_to_non_nullable
+                        as List<OriginalImage>,
+            halfSizeImages:
+                null == halfSizeImages
+                    ? _value.halfSizeImages
+                    : halfSizeImages // ignore: cast_nullable_to_non_nullable
                         as List<OriginalImage>,
             compressAmount:
                 null == compressAmount
@@ -121,6 +129,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
   $Res call({
     bool isConvertingImageToBytes,
     List<OriginalImage> images,
+    List<OriginalImage> halfSizeImages,
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
@@ -144,6 +153,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
   $Res call({
     Object? isConvertingImageToBytes = null,
     Object? images = null,
+    Object? halfSizeImages = null,
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
@@ -160,6 +170,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
             null == images
                 ? _value._images
                 : images // ignore: cast_nullable_to_non_nullable
+                    as List<OriginalImage>,
+        halfSizeImages:
+            null == halfSizeImages
+                ? _value._halfSizeImages
+                : halfSizeImages // ignore: cast_nullable_to_non_nullable
                     as List<OriginalImage>,
         compressAmount:
             null == compressAmount
@@ -194,11 +209,13 @@ class _$ConvertImagesStateImpl
   const _$ConvertImagesStateImpl({
     required this.isConvertingImageToBytes,
     required final List<OriginalImage> images,
+    required final List<OriginalImage> halfSizeImages,
     required this.compressAmount,
     required this.isGrayScale,
     required this.convertMode,
     required final List<ConvertImagesState> imageStateList,
   }) : _images = images,
+       _halfSizeImages = halfSizeImages,
        _imageStateList = imageStateList;
 
   @override
@@ -209,6 +226,14 @@ class _$ConvertImagesStateImpl
     if (_images is EqualUnmodifiableListView) return _images;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_images);
+  }
+
+  final List<OriginalImage> _halfSizeImages;
+  @override
+  List<OriginalImage> get halfSizeImages {
+    if (_halfSizeImages is EqualUnmodifiableListView) return _halfSizeImages;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_halfSizeImages);
   }
 
   @override
@@ -227,7 +252,7 @@ class _$ConvertImagesStateImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, images: $images, halfSizeImages: $halfSizeImages, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList)';
   }
 
   @override
@@ -242,6 +267,7 @@ class _$ConvertImagesStateImpl
         ),
       )
       ..add(DiagnosticsProperty('images', images))
+      ..add(DiagnosticsProperty('halfSizeImages', halfSizeImages))
       ..add(DiagnosticsProperty('compressAmount', compressAmount))
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
       ..add(DiagnosticsProperty('convertMode', convertMode))
@@ -259,6 +285,10 @@ class _$ConvertImagesStateImpl
                 ) ||
                 other.isConvertingImageToBytes == isConvertingImageToBytes) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
+            const DeepCollectionEquality().equals(
+              other._halfSizeImages,
+              _halfSizeImages,
+            ) &&
             (identical(other.compressAmount, compressAmount) ||
                 other.compressAmount == compressAmount) &&
             (identical(other.isGrayScale, isGrayScale) ||
@@ -276,6 +306,7 @@ class _$ConvertImagesStateImpl
     runtimeType,
     isConvertingImageToBytes,
     const DeepCollectionEquality().hash(_images),
+    const DeepCollectionEquality().hash(_halfSizeImages),
     compressAmount,
     isGrayScale,
     convertMode,
@@ -298,6 +329,7 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   const factory _ConvertImagesState({
     required final bool isConvertingImageToBytes,
     required final List<OriginalImage> images,
+    required final List<OriginalImage> halfSizeImages,
     required final int compressAmount,
     required final bool isGrayScale,
     required final ConvertMode convertMode,
@@ -308,6 +340,8 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   bool get isConvertingImageToBytes;
   @override
   List<OriginalImage> get images;
+  @override
+  List<OriginalImage> get halfSizeImages;
   @override
   int get compressAmount;
   @override

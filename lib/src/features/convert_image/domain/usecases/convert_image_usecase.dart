@@ -28,4 +28,10 @@ class ConvertImageUsecase {
   Future<List<OriginalImage>> encodeImage(List<XFile> images) {
     return repo.encodeImages(images);
   }
+
+  Future<List<OriginalImage>> onHalfImagesSize(
+    List<XFile> imageXFiles,
+  ) {
+    return repo.onHalfImagesSize(imageXFiles);
+  }
 }

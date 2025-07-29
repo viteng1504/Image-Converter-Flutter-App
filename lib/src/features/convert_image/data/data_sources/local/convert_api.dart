@@ -71,10 +71,12 @@ class ConvertApi {
     int maxSize,
   ) async {
     final List<OriginalImage> imageList = [];
-    print("maxsize $maxSize");
 
     for (final image in images) {
       final bytes = await image.readAsBytes();
+      print(
+        "maxsize1111111111111111111111111111111111111111111111111111111111111111 ${bytes.length}",
+      );
       img.Image decodedImage = img.decodeImage(bytes)!;
       int width = decodedImage.width;
       int height = decodedImage.height;
@@ -109,6 +111,10 @@ class ConvertApi {
         detectImageFormat(bytes),
       );
 
+      print(
+        "encode iamge 1111111111111111111111111111111111111111111111111111111111 ${originalImage.length}",
+      );
+
       // add to list
       imageList.add(
         OriginalImage(
@@ -136,6 +142,8 @@ class ConvertApi {
   }) async {
     Uint8List imageBytes;
     imageBytes = bytes;
+
+    print("iamge size convert ${imageBytes.length}");
 
     final format = switch (convertMode) {
       ConvertMode.jpg => CompressFormat.jpeg,
@@ -173,6 +181,42 @@ class ConvertApi {
       format: format,
     );
 
+    print("compress image convert ${compressed.length}");
+
     return compressed;
+  }
+
+  Future<List<OriginalImage>> onHalfImagesSize(List<XFile> imageXFiles) async {
+    return await Isolate.run(() async {
+      List<OriginalImage> list = [];
+      for (final image in imageXFiles) {
+        final bytes = await image.readAsBytes();
+        final decodeImage = img.decodeImage(bytes);
+
+        final resizeImage = img.resize(
+          decodeImage!,
+          width: (decodeImage.width * 0.5).toInt(),
+          height: (decodeImage.height * 0.5).toInt(),
+        );
+
+        final encodeImage = img.encodeJpg(resizeImage);
+
+        final originalImageBytes = await FlutterImageCompress.compressWithList(
+          encodeImage,
+          quality: 90,
+          format: CompressFormat.jpeg,
+        );
+        print("half size image test ${originalImageBytes.length} ");
+
+        list.add(
+          OriginalImage(
+            halfSizeImagebytes: encodeImage,
+            bytes: bytes,
+            name: image.name,
+          ),
+        );
+      }
+      return list;
+    });
   }
 }

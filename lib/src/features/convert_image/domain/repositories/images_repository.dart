@@ -14,4 +14,7 @@ abstract class ImagesRepository {
     required bool isGrayScale,
     required ConvertMode convertMode,
   });
+  Future<List<OriginalImage>> onHalfImagesSize(
+    List<XFile> imageXFiles,
+  );
 }

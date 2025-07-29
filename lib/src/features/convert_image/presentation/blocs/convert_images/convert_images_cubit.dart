@@ -7,9 +7,9 @@ import '../../../domain/usecases/convert_image_usecase.dart';
 import 'convert_images_state.dart';
 
 class ConvertImagesCubit extends Cubit<ConvertImagesState> {
-  ConvertImageUsecase selectImageUsecase;
+  ConvertImageUsecase convertImageUsecase;
 
-  ConvertImagesCubit(this.selectImageUsecase)
+  ConvertImagesCubit(this.convertImageUsecase)
     : super(ConvertImagesState.initial());
 
   void isLoadingFalse() {
@@ -19,12 +19,19 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   Future<void> onConvertImages(List<XFile> imageXFiles) async {
     emit(state.copyWith(isConvertingImageToBytes: true));
 
-    final List<OriginalImage> originalImages = await selectImageUsecase
+    final List<OriginalImage> originalImages = await convertImageUsecase
         .encodeImage(imageXFiles);
     print(originalImages.length);
     emit(
       state.copyWith(images: originalImages, isConvertingImageToBytes: false),
     );
+  }
+
+  Future<void> onHalfImagesSize(List<XFile> imageXFiles) async {
+    List<OriginalImage> newOriginalImages = await convertImageUsecase
+        .onHalfImagesSize(imageXFiles);
+    print(imageXFiles.length);
+    emit(state.copyWith(images: newOriginalImages));
   }
 
   //select convert mode

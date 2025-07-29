@@ -11,6 +11,7 @@ class ConvertImagesState with _$ConvertImagesState {
   const factory ConvertImagesState({
     required bool isConvertingImageToBytes,
     required List<OriginalImage> images,
+    required List<OriginalImage> halfSizeImages,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
@@ -24,5 +25,6 @@ class ConvertImagesState with _$ConvertImagesState {
     isGrayScale: false,
     convertMode: ConvertMode.jpg,
     imageStateList: [],
+    halfSizeImages: [],
   );
 }

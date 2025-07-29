@@ -37,4 +37,11 @@ class ImagesRepositoryImpl implements ImagesRepository {
       convertMode: convertMode,
     );
   }
+
+  @override
+  Future<List<OriginalImage>> onHalfImagesSize(
+    List<XFile> imageXFiles,
+  ) async {
+    return await api.onHalfImagesSize(imageXFiles);
+  }
 }

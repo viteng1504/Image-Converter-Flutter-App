@@ -38,11 +38,21 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
       ImagesRepositoryImpl(ConvertApi()),
     );
 
-    return BlocProvider(
-      create:
-          (context) =>
-              ConvertImagesCubit(convertImageUsecase)
-                ..onConvertImages(widget.images),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create:
+              (context) =>
+                  ConvertImagesCubit(convertImageUsecase)
+                    ..onConvertImages(widget.images)
+                    ..onHalfImagesSize(widget.images),
+        ),
+
+        BlocProvider(
+          create: (context) => ImageDisplayCubit(convertImageUsecase),
+        ),
+      ],
+
       child: BlocConsumer<ConvertImagesCubit, ConvertImagesState>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -145,8 +155,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                           itemBuilder: (context, index) {
                             final OriginalImage image = state.images[index];
                             Uint8List bytes =
-                                state.compressAmount != 0
-                                    ? image.halfSizeImagebytes
+                                state.compressAmount != 0 &&
+                                        image.halfSizeImagebytes != null
+                                    ? image.halfSizeImagebytes!
                                     : image.bytes;
                             final String size = Utils.formatSize(
                               image.bytes.length,
@@ -285,12 +296,7 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                             if (state.convertMode == ConvertMode.pdf) {
                               final List<Uint8List> imageBytesList =
                                   state.images
-                                      .map(
-                                        (image) =>
-                                            state.compressAmount != 0
-                                                ? image.halfSizeImagebytes
-                                                : image.bytes,
-                                      )
+                                      .map((image) => image.bytes)
                                       .toList();
                               Uint8List firstImage = imageBytesList[0];
                               final file = await Convert().convertImageToPdf(
