@@ -1,15 +1,11 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../../../core/resources/app_colors.dart';
-import '../../../../../core/utils/utils.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
-import '../../../domain/entities/original_image.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';
 import '../../blocs/convert_images/convert_images_cubit.dart';
 import '../../blocs/convert_images/convert_images_state.dart';
@@ -56,6 +52,8 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
       child: BlocConsumer<ConvertImagesCubit, ConvertImagesState>(
         listener: (context, state) {},
         builder: (context, state) {
+          final cubits = context.watch<ConvertImagesCubit>().state.cubits;
+
           return state.isConvertingImageToBytes
               ? const Scaffold(
                 body: Center(
@@ -153,34 +151,30 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               ),
                           itemCount: widget.images.length,
                           itemBuilder: (context, index) {
-                            final OriginalImage image = state.images[index];
-                            Uint8List bytes =
-                                state.compressAmount != 0 &&
-                                        image.halfSizeImagebytes != null
-                                    ? image.halfSizeImagebytes!
-                                    : image.bytes;
-                            final String size = Utils.formatSize(
-                              image.bytes.length,
-                            );
+                            // final OriginalImage image = state.images[index];
+                            // Uint8List bytes =
+                            //     state.compressAmount != 0 &&
+                            //             image.halfSizeImagebytes != null
+                            //         ? image.halfSizeImagebytes!
+                            //         : image.bytes;
 
-                            return BlocProvider(
+                            return BlocProvider.value(
+                              value: cubits[index],
                               key: ValueKey(
                                 "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
                               ),
-                              create:
-                                  (context) =>
-                                      ImageDisplayCubit(convertImageUsecase)
-                                        ..convertImage(
-                                          bytes: bytes,
-                                          compressAmount: state.compressAmount,
-                                          isGrayScale: state.isGrayScale,
-                                          convertMode: state.convertMode,
-                                        ),
+
                               child: BlocBuilder<
                                 ImageDisplayCubit,
                                 ImageDisplayState
                               >(
-                                builder: (context, imageState) {
+                                builder: (imageContext, imageState) {
+                                  // if (imageState.isLoadingImage) {
+                                  //   // Đang convert ảnh mới → hiển thị loading rõ ràng
+                                  //   return const Center(
+                                  //     child: CircularProgressIndicator(),
+                                  //   );
+                                  // }
                                   return DisplayImage(
                                     bytes: imageState.image,
                                     size:
@@ -277,12 +271,6 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
 
                       // select mode
                       SelectMode(
-                        sliderValue: compressAmount.toDouble(),
-                        onChanged: (value) {
-                          setState(() {
-                            compressAmount = value.toInt();
-                          });
-                        },
                         onChangedEnd: (value) {
                           context
                               .read<ConvertImagesCubit>()

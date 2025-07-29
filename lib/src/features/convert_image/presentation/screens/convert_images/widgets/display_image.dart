@@ -10,7 +10,7 @@ class DisplayImage extends StatefulWidget {
   final bool isLoadingSize;
   const DisplayImage({
     super.key,
-    required this.bytes,
+    this.bytes,
     required this.size,
     required this.isLoadingImage,
     required this.isLoadingSize,
@@ -36,7 +36,7 @@ class _DisplayImageState extends State<DisplayImage> {
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
               child:
-                  (widget.isLoadingImage && widget.bytes == null)
+                  (widget.isLoadingImage)
                       ? const ColoredBox(
                         color: AppColors.indicatorDot,
                         child: Center(
@@ -50,6 +50,24 @@ class _DisplayImageState extends State<DisplayImage> {
                         fit: BoxFit.cover,
                         height: double.infinity,
                         width: double.infinity,
+                        // gaplessPlayback: true,
+                        frameBuilder: (
+                          context,
+                          child,
+                          frame,
+                          wasSynchronouslyLoaded,
+                        ) {
+                          //loading if image.memory doenst finish decoding
+                          if (wasSynchronouslyLoaded || frame != null) {
+                            return child;
+                          } else {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            ); //
+                          }
+                        },
                       ),
             ),
             Positioned(

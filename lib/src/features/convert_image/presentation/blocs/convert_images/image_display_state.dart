@@ -9,6 +9,7 @@ class ImageDisplayState with _$ImageDisplayState {
     required bool isLoadingImage,
     required bool isLoadingSize,
     Uint8List? image,
+    Uint8List? cachedImage,
     String? size,
   }) = _ImageDisplayState;
 

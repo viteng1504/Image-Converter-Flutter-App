@@ -5,15 +5,8 @@ import '../../../../../../core/resources/app_assets.dart';
 enum Mode { compress, other }
 
 class SelectMode extends StatefulWidget {
-  final double sliderValue;
-  final Function(double) onChanged;
   final Function(double) onChangedEnd;
-  const SelectMode({
-    super.key,
-    required this.sliderValue,
-    required this.onChanged,
-    required this.onChangedEnd,
-  });
+  const SelectMode({super.key, required this.onChangedEnd});
 
   @override
   _SelectModeState createState() => _SelectModeState();
@@ -22,6 +15,8 @@ class SelectMode extends StatefulWidget {
 class _SelectModeState extends State<SelectMode> {
   Mode _modeSelected = Mode.compress;
   bool _checkValue = false;
+  // double value = .sliderValue;
+  double sliderValue = 0;
 
   void onCheckValueChanged() {
     setState(() {
@@ -76,7 +71,7 @@ class _SelectModeState extends State<SelectMode> {
               SizedBox(
                 width: 50,
                 child: Text(
-                  "${widget.sliderValue.round().toString()}%",
+                  "${sliderValue.round().toString()}%",
                   style: const TextStyle(
                     color: AppColors.fontGray,
                     fontSize: 16,
@@ -98,8 +93,14 @@ class _SelectModeState extends State<SelectMode> {
                     trackShape: RoundedRectSliderTrackShape(),
                   ),
                   child: Slider(
-                    value: widget.sliderValue,
-                    onChanged: widget.onChanged,
+                    value: sliderValue,
+                    onChanged: (value) {
+                      setState(() {
+                        // widget.onChanged(value);
+                        // sliderChanged(value);
+                        sliderValue = value;
+                      });
+                    },
                     onChangeEnd: widget.onChangedEnd,
                     min: 0,
                     max: 100,
@@ -193,7 +194,7 @@ class _SelectModeState extends State<SelectMode> {
           spacing: 8,
           // mainAxisSize: MainAxisSize.max,
           children: [
-            if (mode == Mode.compress && widget.sliderValue != 0)
+            if (mode == Mode.compress && sliderValue != 0)
               const DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppColors.primary,

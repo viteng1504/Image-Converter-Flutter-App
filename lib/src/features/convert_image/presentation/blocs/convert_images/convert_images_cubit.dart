@@ -5,9 +5,11 @@ import '../../../../../core/enums/convert_mode.dart';
 import '../../../domain/entities/original_image.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';
 import 'convert_images_state.dart';
+import 'image_display_cubit.dart';
 
 class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   ConvertImageUsecase convertImageUsecase;
+  final List<ImageDisplayCubit> cubits = [];
 
   ConvertImagesCubit(this.convertImageUsecase)
     : super(ConvertImagesState.initial());
@@ -16,11 +18,35 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     emit(state.copyWith(isConvertingImageToBytes: false));
   }
 
+  //create cubit list for each image
+  Future<void> onCreateImageDisplayCubits(
+    List<OriginalImage> originalImages,
+  ) async {
+    for (final image in originalImages) {
+      final bytes = image.bytes;
+
+      final cubit = ImageDisplayCubit(convertImageUsecase)..convertImage(
+        bytes: bytes,
+        compressAmount: state.compressAmount,
+        isGrayScale: state.isGrayScale,
+        convertMode: state.convertMode,
+      );
+
+      cubits.add(cubit);
+    }
+
+    emit(state.copyWith(cubits: cubits));
+  }
+
+  //convert to original images from xfiles
   Future<void> onConvertImages(List<XFile> imageXFiles) async {
     emit(state.copyWith(isConvertingImageToBytes: true));
 
     final List<OriginalImage> originalImages = await convertImageUsecase
         .encodeImage(imageXFiles);
+
+    await onCreateImageDisplayCubits(originalImages);
+
     print(originalImages.length);
     emit(
       state.copyWith(images: originalImages, isConvertingImageToBytes: false),
@@ -35,13 +61,41 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   //select convert mode
-  void onSelectConvertMode(ConvertMode convertMode) {
+  void onSelectConvertMode(ConvertMode convertMode) async {
     emit(state.copyWith(convertMode: convertMode));
+
+    for (int i = 0; i < state.cubits.length; i++) {
+      final image = state.images[i];
+      final bytes = image.bytes;
+
+      final cubit = state.cubits[i];
+      cubit.convertImage(
+        bytes: bytes,
+        compressAmount: state.compressAmount,
+        isGrayScale: state.isGrayScale,
+        convertMode: convertMode,
+      );
+    }
   }
 
   // compression amount changed
   void onCompressionAmountChanged(int value) {
     emit(state.copyWith(compressAmount: value));
+
+    for (int i = 0; i < state.cubits.length; i++) {
+      final image = state.images[i];
+      final bytes = image.bytes;
+
+      final cubit = state.cubits[i];
+      cubit
+        ..onLoading()
+        ..convertImage(
+          bytes: bytes,
+          compressAmount: state.compressAmount,
+          isGrayScale: state.isGrayScale,
+          convertMode: state.convertMode,
+        );
+    }
   }
 
   // Future<void> convertImage({

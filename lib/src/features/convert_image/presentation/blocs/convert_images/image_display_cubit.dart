@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/enums/convert_mode.dart';
@@ -38,6 +38,13 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     required ConvertMode convertMode,
   }) async {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
+    // if (state.cachedImage == null) {
+    //   print("bi convert asdfaosjdfasodifjasdoifajdsf");
+    //   emit(state.copyWith(cachedImage: state.image));
+
+    //   return;
+    // }
+    // print(listEquals(state.cachedImage, state.image));
 
     final image = await convertImageUsecase.convertImage(
       bytes: bytes,
@@ -51,10 +58,19 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     emit(
       state.copyWith(
         image: image,
+        // cachedImage: image,
         size: Utils.formatSize(image.length),
         isLoadingImage: false,
         isLoadingSize: false,
       ),
     );
+  }
+
+  void  onLoading() {
+    emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
+  }
+
+  void onStopLoading() {
+    emit(state.copyWith(isLoadingImage: false, isLoadingSize: false));
   }
 }

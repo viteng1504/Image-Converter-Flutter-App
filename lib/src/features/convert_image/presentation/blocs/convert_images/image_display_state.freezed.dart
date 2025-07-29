@@ -20,6 +20,7 @@ mixin _$ImageDisplayState {
   bool get isLoadingImage => throw _privateConstructorUsedError;
   bool get isLoadingSize => throw _privateConstructorUsedError;
   Uint8List? get image => throw _privateConstructorUsedError;
+  Uint8List? get cachedImage => throw _privateConstructorUsedError;
   String? get size => throw _privateConstructorUsedError;
 
   /// Create a copy of ImageDisplayState
@@ -40,6 +41,7 @@ abstract class $ImageDisplayStateCopyWith<$Res> {
     bool isLoadingImage,
     bool isLoadingSize,
     Uint8List? image,
+    Uint8List? cachedImage,
     String? size,
   });
 }
@@ -62,6 +64,7 @@ class _$ImageDisplayStateCopyWithImpl<$Res, $Val extends ImageDisplayState>
     Object? isLoadingImage = null,
     Object? isLoadingSize = null,
     Object? image = freezed,
+    Object? cachedImage = freezed,
     Object? size = freezed,
   }) {
     return _then(
@@ -80,6 +83,11 @@ class _$ImageDisplayStateCopyWithImpl<$Res, $Val extends ImageDisplayState>
                 freezed == image
                     ? _value.image
                     : image // ignore: cast_nullable_to_non_nullable
+                        as Uint8List?,
+            cachedImage:
+                freezed == cachedImage
+                    ? _value.cachedImage
+                    : cachedImage // ignore: cast_nullable_to_non_nullable
                         as Uint8List?,
             size:
                 freezed == size
@@ -105,6 +113,7 @@ abstract class _$$ImageDisplayStateImplCopyWith<$Res>
     bool isLoadingImage,
     bool isLoadingSize,
     Uint8List? image,
+    Uint8List? cachedImage,
     String? size,
   });
 }
@@ -126,6 +135,7 @@ class __$$ImageDisplayStateImplCopyWithImpl<$Res>
     Object? isLoadingImage = null,
     Object? isLoadingSize = null,
     Object? image = freezed,
+    Object? cachedImage = freezed,
     Object? size = freezed,
   }) {
     return _then(
@@ -144,6 +154,11 @@ class __$$ImageDisplayStateImplCopyWithImpl<$Res>
             freezed == image
                 ? _value.image
                 : image // ignore: cast_nullable_to_non_nullable
+                    as Uint8List?,
+        cachedImage:
+            freezed == cachedImage
+                ? _value.cachedImage
+                : cachedImage // ignore: cast_nullable_to_non_nullable
                     as Uint8List?,
         size:
             freezed == size
@@ -164,6 +179,7 @@ class _$ImageDisplayStateImpl
     required this.isLoadingImage,
     required this.isLoadingSize,
     this.image,
+    this.cachedImage,
     this.size,
   });
 
@@ -174,11 +190,13 @@ class _$ImageDisplayStateImpl
   @override
   final Uint8List? image;
   @override
+  final Uint8List? cachedImage;
+  @override
   final String? size;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ImageDisplayState(isLoadingImage: $isLoadingImage, isLoadingSize: $isLoadingSize, image: $image, size: $size)';
+    return 'ImageDisplayState(isLoadingImage: $isLoadingImage, isLoadingSize: $isLoadingSize, image: $image, cachedImage: $cachedImage, size: $size)';
   }
 
   @override
@@ -189,6 +207,7 @@ class _$ImageDisplayStateImpl
       ..add(DiagnosticsProperty('isLoadingImage', isLoadingImage))
       ..add(DiagnosticsProperty('isLoadingSize', isLoadingSize))
       ..add(DiagnosticsProperty('image', image))
+      ..add(DiagnosticsProperty('cachedImage', cachedImage))
       ..add(DiagnosticsProperty('size', size));
   }
 
@@ -202,6 +221,10 @@ class _$ImageDisplayStateImpl
             (identical(other.isLoadingSize, isLoadingSize) ||
                 other.isLoadingSize == isLoadingSize) &&
             const DeepCollectionEquality().equals(other.image, image) &&
+            const DeepCollectionEquality().equals(
+              other.cachedImage,
+              cachedImage,
+            ) &&
             (identical(other.size, size) || other.size == size));
   }
 
@@ -211,6 +234,7 @@ class _$ImageDisplayStateImpl
     isLoadingImage,
     isLoadingSize,
     const DeepCollectionEquality().hash(image),
+    const DeepCollectionEquality().hash(cachedImage),
     size,
   );
 
@@ -231,6 +255,7 @@ abstract class _ImageDisplayState implements ImageDisplayState {
     required final bool isLoadingImage,
     required final bool isLoadingSize,
     final Uint8List? image,
+    final Uint8List? cachedImage,
     final String? size,
   }) = _$ImageDisplayStateImpl;
 
@@ -240,6 +265,8 @@ abstract class _ImageDisplayState implements ImageDisplayState {
   bool get isLoadingSize;
   @override
   Uint8List? get image;
+  @override
+  Uint8List? get cachedImage;
   @override
   String? get size;
 

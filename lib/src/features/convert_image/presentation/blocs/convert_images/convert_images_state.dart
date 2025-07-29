@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../domain/entities/original_image.dart';
+import 'image_display_cubit.dart';
 
 part 'convert_images_state.freezed.dart';
 
@@ -16,6 +17,7 @@ class ConvertImagesState with _$ConvertImagesState {
     required bool isGrayScale,
     required ConvertMode convertMode,
     required List<ConvertImagesState> imageStateList,
+    required List<ImageDisplayCubit> cubits,
   }) = _ConvertImagesState;
 
   factory ConvertImagesState.initial() => const ConvertImagesState(
@@ -26,5 +28,6 @@ class ConvertImagesState with _$ConvertImagesState {
     convertMode: ConvertMode.jpg,
     imageStateList: [],
     halfSizeImages: [],
+    cubits: [],
   );
 }
