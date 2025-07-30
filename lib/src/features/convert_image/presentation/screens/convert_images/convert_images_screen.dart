@@ -1,7 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+import '../../../../../core/device_info.dart';
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../../../core/resources/app_colors.dart';
 import '../../../data/data_sources/local/convert_api.dart';
@@ -29,6 +32,15 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
   int compressAmount = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    if (DeviceInfo.maxSize == 0) {
+      DeviceInfo.init();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ConvertImageUsecase convertImageUsecase = ConvertImageUsecase(
       ImagesRepositoryImpl(ConvertApi()),
@@ -40,8 +52,7 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
           create:
               (context) =>
                   ConvertImagesCubit(convertImageUsecase)
-                    ..onConvertImages(widget.images)
-                    ..onHalfImagesSize(widget.images),
+                    ..onConvertImages(widget.images),
         ),
 
         BlocProvider(
@@ -220,9 +231,11 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                             children: [
                               ConvertModeButton(
                                 onPressed: () {
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onSelectConvertMode(ConvertMode.jpg);
+                                  if (state.convertMode != ConvertMode.jpg) {
+                                    context
+                                        .read<ConvertImagesCubit>()
+                                        .onSelectConvertMode(ConvertMode.jpg);
+                                  }
                                 },
                                 label: "JPG",
                                 isSelected:
@@ -231,9 +244,11 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               ),
                               ConvertModeButton(
                                 onPressed: () {
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onSelectConvertMode(ConvertMode.png);
+                                  if (state.convertMode != ConvertMode.png) {
+                                    context
+                                        .read<ConvertImagesCubit>()
+                                        .onSelectConvertMode(ConvertMode.png);
+                                  }
                                 },
                                 label: "PNG",
                                 isSelected:
@@ -242,9 +257,11 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               ),
                               ConvertModeButton(
                                 onPressed: () {
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onSelectConvertMode(ConvertMode.webp);
+                                  if (state.convertMode != ConvertMode.webp) {
+                                    context
+                                        .read<ConvertImagesCubit>()
+                                        .onSelectConvertMode(ConvertMode.webp);
+                                  }
                                 },
                                 label: "WEBP",
                                 isSelected:
@@ -253,9 +270,11 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               ),
                               ConvertModeButton(
                                 onPressed: () {
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onSelectConvertMode(ConvertMode.pdf);
+                                  if (state.convertMode != ConvertMode.pdf) {
+                                    context
+                                        .read<ConvertImagesCubit>()
+                                        .onSelectConvertMode(ConvertMode.pdf);
+                                  }
                                 },
                                 label: "PDF",
                                 isSelected:

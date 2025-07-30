@@ -12,13 +12,13 @@ class ConvertImageUsecase {
   ConvertImageUsecase(this.repo);
 
   Future<Uint8List> convertImage({
-    required Uint8List bytes,
+    required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
   }) async {
     return await repo.convertImage(
-      bytes: bytes,
+      originalImage: originalImage,
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
@@ -27,11 +27,5 @@ class ConvertImageUsecase {
 
   Future<List<OriginalImage>> encodeImage(List<XFile> images) {
     return repo.encodeImages(images);
-  }
-
-  Future<List<OriginalImage>> onHalfImagesSize(
-    List<XFile> imageXFiles,
-  ) {
-    return repo.onHalfImagesSize(imageXFiles);
   }
 }

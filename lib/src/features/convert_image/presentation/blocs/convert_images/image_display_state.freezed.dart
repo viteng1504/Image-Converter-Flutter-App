@@ -19,6 +19,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$ImageDisplayState {
   bool get isLoadingImage => throw _privateConstructorUsedError;
   bool get isLoadingSize => throw _privateConstructorUsedError;
+  bool get isGrayScaling => throw _privateConstructorUsedError;
   Uint8List? get image => throw _privateConstructorUsedError;
   Uint8List? get cachedImage => throw _privateConstructorUsedError;
   String? get size => throw _privateConstructorUsedError;
@@ -40,6 +41,7 @@ abstract class $ImageDisplayStateCopyWith<$Res> {
   $Res call({
     bool isLoadingImage,
     bool isLoadingSize,
+    bool isGrayScaling,
     Uint8List? image,
     Uint8List? cachedImage,
     String? size,
@@ -63,6 +65,7 @@ class _$ImageDisplayStateCopyWithImpl<$Res, $Val extends ImageDisplayState>
   $Res call({
     Object? isLoadingImage = null,
     Object? isLoadingSize = null,
+    Object? isGrayScaling = null,
     Object? image = freezed,
     Object? cachedImage = freezed,
     Object? size = freezed,
@@ -78,6 +81,11 @@ class _$ImageDisplayStateCopyWithImpl<$Res, $Val extends ImageDisplayState>
                 null == isLoadingSize
                     ? _value.isLoadingSize
                     : isLoadingSize // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            isGrayScaling:
+                null == isGrayScaling
+                    ? _value.isGrayScaling
+                    : isGrayScaling // ignore: cast_nullable_to_non_nullable
                         as bool,
             image:
                 freezed == image
@@ -112,6 +120,7 @@ abstract class _$$ImageDisplayStateImplCopyWith<$Res>
   $Res call({
     bool isLoadingImage,
     bool isLoadingSize,
+    bool isGrayScaling,
     Uint8List? image,
     Uint8List? cachedImage,
     String? size,
@@ -134,6 +143,7 @@ class __$$ImageDisplayStateImplCopyWithImpl<$Res>
   $Res call({
     Object? isLoadingImage = null,
     Object? isLoadingSize = null,
+    Object? isGrayScaling = null,
     Object? image = freezed,
     Object? cachedImage = freezed,
     Object? size = freezed,
@@ -149,6 +159,11 @@ class __$$ImageDisplayStateImplCopyWithImpl<$Res>
             null == isLoadingSize
                 ? _value.isLoadingSize
                 : isLoadingSize // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        isGrayScaling:
+            null == isGrayScaling
+                ? _value.isGrayScaling
+                : isGrayScaling // ignore: cast_nullable_to_non_nullable
                     as bool,
         image:
             freezed == image
@@ -178,6 +193,7 @@ class _$ImageDisplayStateImpl
   const _$ImageDisplayStateImpl({
     required this.isLoadingImage,
     required this.isLoadingSize,
+    required this.isGrayScaling,
     this.image,
     this.cachedImage,
     this.size,
@@ -188,6 +204,8 @@ class _$ImageDisplayStateImpl
   @override
   final bool isLoadingSize;
   @override
+  final bool isGrayScaling;
+  @override
   final Uint8List? image;
   @override
   final Uint8List? cachedImage;
@@ -196,7 +214,7 @@ class _$ImageDisplayStateImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ImageDisplayState(isLoadingImage: $isLoadingImage, isLoadingSize: $isLoadingSize, image: $image, cachedImage: $cachedImage, size: $size)';
+    return 'ImageDisplayState(isLoadingImage: $isLoadingImage, isLoadingSize: $isLoadingSize, isGrayScaling: $isGrayScaling, image: $image, cachedImage: $cachedImage, size: $size)';
   }
 
   @override
@@ -206,6 +224,7 @@ class _$ImageDisplayStateImpl
       ..add(DiagnosticsProperty('type', 'ImageDisplayState'))
       ..add(DiagnosticsProperty('isLoadingImage', isLoadingImage))
       ..add(DiagnosticsProperty('isLoadingSize', isLoadingSize))
+      ..add(DiagnosticsProperty('isGrayScaling', isGrayScaling))
       ..add(DiagnosticsProperty('image', image))
       ..add(DiagnosticsProperty('cachedImage', cachedImage))
       ..add(DiagnosticsProperty('size', size));
@@ -220,6 +239,8 @@ class _$ImageDisplayStateImpl
                 other.isLoadingImage == isLoadingImage) &&
             (identical(other.isLoadingSize, isLoadingSize) ||
                 other.isLoadingSize == isLoadingSize) &&
+            (identical(other.isGrayScaling, isGrayScaling) ||
+                other.isGrayScaling == isGrayScaling) &&
             const DeepCollectionEquality().equals(other.image, image) &&
             const DeepCollectionEquality().equals(
               other.cachedImage,
@@ -233,6 +254,7 @@ class _$ImageDisplayStateImpl
     runtimeType,
     isLoadingImage,
     isLoadingSize,
+    isGrayScaling,
     const DeepCollectionEquality().hash(image),
     const DeepCollectionEquality().hash(cachedImage),
     size,
@@ -254,6 +276,7 @@ abstract class _ImageDisplayState implements ImageDisplayState {
   const factory _ImageDisplayState({
     required final bool isLoadingImage,
     required final bool isLoadingSize,
+    required final bool isGrayScaling,
     final Uint8List? image,
     final Uint8List? cachedImage,
     final String? size,
@@ -263,6 +286,8 @@ abstract class _ImageDisplayState implements ImageDisplayState {
   bool get isLoadingImage;
   @override
   bool get isLoadingSize;
+  @override
+  bool get isGrayScaling;
   @override
   Uint8List? get image;
   @override

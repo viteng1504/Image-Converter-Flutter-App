@@ -9,12 +9,9 @@ abstract class ImagesRepository {
   Future<List<XFile>> selectImages();
   Future<List<OriginalImage>> encodeImages(List<XFile> images);
   Future<Uint8List> convertImage({
-    required Uint8List bytes,
+    required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
   });
-  Future<List<OriginalImage>> onHalfImagesSize(
-    List<XFile> imageXFiles,
-  );
 }

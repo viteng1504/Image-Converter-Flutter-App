@@ -23,10 +23,8 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     List<OriginalImage> originalImages,
   ) async {
     for (final image in originalImages) {
-      final bytes = image.bytes;
-
       final cubit = ImageDisplayCubit(convertImageUsecase)..convertImage(
-        bytes: bytes,
+        originalImage: image,
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
         convertMode: state.convertMode,
@@ -45,19 +43,12 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     final List<OriginalImage> originalImages = await convertImageUsecase
         .encodeImage(imageXFiles);
 
+    emit(state.copyWith(isConvertingImageToBytes: false));
+
     await onCreateImageDisplayCubits(originalImages);
 
     print(originalImages.length);
-    emit(
-      state.copyWith(images: originalImages, isConvertingImageToBytes: false),
-    );
-  }
-
-  Future<void> onHalfImagesSize(List<XFile> imageXFiles) async {
-    List<OriginalImage> newOriginalImages = await convertImageUsecase
-        .onHalfImagesSize(imageXFiles);
-    print(imageXFiles.length);
-    emit(state.copyWith(images: newOriginalImages));
+    emit(state.copyWith(images: originalImages));
   }
 
   //select convert mode
@@ -66,11 +57,10 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
     for (int i = 0; i < state.cubits.length; i++) {
       final image = state.images[i];
-      final bytes = image.bytes;
 
       final cubit = state.cubits[i];
       cubit.convertImage(
-        bytes: bytes,
+        originalImage: image,
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
         convertMode: convertMode,
@@ -84,13 +74,12 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
     for (int i = 0; i < state.cubits.length; i++) {
       final image = state.images[i];
-      final bytes = image.bytes;
 
       final cubit = state.cubits[i];
       cubit
         ..onLoading()
         ..convertImage(
-          bytes: bytes,
+          originalImage: image,
           compressAmount: state.compressAmount,
           isGrayScale: state.isGrayScale,
           convertMode: state.convertMode,

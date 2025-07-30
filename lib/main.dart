@@ -1,6 +1,3 @@
-import 'dart:math';
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,12 +10,12 @@ import 'src/features/product/presentation/screens/saved_files_screen.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  final physicalScreenSize = window.physicalSize;
-  final deviceWidth = physicalScreenSize.width.toInt();
-  final deviceHeight = physicalScreenSize.height.toInt();
-  DeviceInfo.maxSize = max(deviceWidth, deviceHeight);
-  print(DeviceInfo.maxSize);
 
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    DeviceInfo.init();
+  });
+
+  print(DeviceInfo.maxSize);
   runApp(const MyApp());
 }
 

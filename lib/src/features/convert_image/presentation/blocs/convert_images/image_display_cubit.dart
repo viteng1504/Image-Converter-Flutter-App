@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../../../core/utils/utils.dart';
+import '../../../domain/entities/original_image.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';
 import 'image_display_state.dart';
 
@@ -32,7 +32,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
   // void saveImageState()
 
   Future<void> convertImage({
-    required Uint8List bytes,
+    required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
@@ -47,7 +47,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     // print(listEquals(state.cachedImage, state.image));
 
     final image = await convertImageUsecase.convertImage(
-      bytes: bytes,
+      originalImage: originalImage,
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
@@ -66,7 +66,11 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     );
   }
 
-  void  onLoading() {
+  Future<void> onGrayScaling() async {
+    
+  }
+
+  void onLoading() {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
   }
 

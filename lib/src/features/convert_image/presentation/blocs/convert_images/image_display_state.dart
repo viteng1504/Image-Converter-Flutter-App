@@ -8,11 +8,15 @@ class ImageDisplayState with _$ImageDisplayState {
   const factory ImageDisplayState({
     required bool isLoadingImage,
     required bool isLoadingSize,
+    required bool isGrayScaling,
     Uint8List? image,
     Uint8List? cachedImage,
     String? size,
   }) = _ImageDisplayState;
 
-  factory ImageDisplayState.initial() =>
-      const ImageDisplayState(isLoadingImage: true, isLoadingSize: true);
+  factory ImageDisplayState.initial() => const ImageDisplayState(
+    isLoadingImage: true,
+    isLoadingSize: true,
+    isGrayScaling: false,
+  );
 }

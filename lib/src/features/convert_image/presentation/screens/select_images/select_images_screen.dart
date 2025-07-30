@@ -1,6 +1,10 @@
+import 'dart:math';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../../core/device_info.dart';
 import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
@@ -13,6 +17,11 @@ class SelectImagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final physicalScreenSize = window.physicalSize;
+    final deviceWidth = physicalScreenSize.width.toInt();
+    final deviceHeight = physicalScreenSize.height.toInt();
+    DeviceInfo.maxSize = max(deviceWidth, deviceHeight);
+    print(DeviceInfo.maxSize);
     // final logicalSize = MediaQuery.of(context).size;
     // final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 
