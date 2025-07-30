@@ -15,6 +15,7 @@ import '../../blocs/convert_images/convert_images_cubit.dart';
 import '../../blocs/convert_images/convert_images_state.dart';
 import '../../blocs/convert_images/image_display_cubit.dart';
 import '../../blocs/convert_images/image_display_state.dart';
+import 'convert_to_pdf.dart';
 import 'widgets/convert_button.dart';
 import 'widgets/convert_mode_button.dart';
 import 'widgets/display_image.dart';
@@ -278,7 +279,35 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                         },
                       ),
 
-                      Center(child: ConvertButton(onPressed: () {})),
+                      Center(
+                        child: ConvertButton(
+                          onPressed: () async {
+                            if (state.convertMode == ConvertMode.pdf) {
+                              final List<Uint8List> imageBytesList =
+                                  state.images
+                                      .map(
+                                        (image) =>
+                                            state.compressAmount != 0
+                                                ? image.halfSizeImagebytes
+                                                : image.bytes,
+                                      )
+                                      .toList();
+                              Uint8List firstImage = imageBytesList[0];
+                              final file = await Convert().convertImageToPdf(
+                                imageBytesList,
+                              );
+                              Navigator.pushNamed(
+                                context,
+                                "/saved_files",
+                                arguments: {
+                                  "pdfFile": file,
+                                  "firstImage": firstImage,
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),

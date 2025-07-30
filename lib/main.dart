@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "welcome": (context) => const WelcomeMainScreen(),
         "select_images": (context) => const SelectImagesScreen(),
-        "saved_files": (context) => const SavedFilesScreen(),
+        "/saved_files": (context) => const SavedFilesScreen(),
       },
     );
   }

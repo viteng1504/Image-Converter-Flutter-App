@@ -1,6 +1,8 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:open_file/open_file.dart';
 
 import '../../../../core/resources/app_assets.dart';
 
@@ -26,6 +28,36 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
   ];
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final pdfFile = args["pdfFile"];
+    final Uint8List firstImage = args["firstImage"];
+    final String fileName = pdfFile.uri.pathSegments.last;
+    final int fileSize = pdfFile.lengthSync();
+    final String filePath = pdfFile.parent.path;
+    String readableSize;
+    if (fileSize < 1024) {
+      readableSize = '$fileSize B';
+    } else if (fileSize < 1024 * 1024) {
+      readableSize = '${(fileSize / 1024).toStringAsFixed(2)} kB';
+    } else if (fileSize < 1024 * 1024 * 1024) {
+      readableSize = '${(fileSize / (1024 * 1024)).toStringAsFixed(2)} mB';
+    } else if (fileSize < 1024 * 1024 * 1024 * 1024) {
+      readableSize =
+          '${(fileSize / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
+    } else {
+      readableSize =
+          '${(fileSize / (1024 * 1024 * 1024 * 1024)).toStringAsFixed(2)} TB';
+    }
+    final List<Map<String, dynamic>> savedFiles = [
+      {
+        "fileName": fileName,
+        "fileSize": readableSize,
+        "filePath": filePath,
+        "thumbnail": firstImage,
+      },
+    ];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -116,65 +148,81 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
               height: 480,
               child: ListView.builder(
                 itemBuilder: (context, index) {
+                  final file = savedFiles[index];
                   return Padding(
                     padding: EdgeInsets.only(bottom: index != 9 ? 8.0 : 0.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(8),
-                              topRight: Radius.circular(8),
+                        InkWell(
+                          onTap: () async {
+                            final result = await OpenFile.open(pdfFile.path);
+                            if (result.type != ResultType.done) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Không mở được file')),
+                              );
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.3),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(8),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                  ),
+                                  child: Image.memory(
+                                    file['thumbnail'],
+                                    width: 120,
+                                    height: 130,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                child: Image.asset(
-                                  AppImages.image,
-                                  width: 120,
-                                  height: 130,
-                                  fit: BoxFit.cover,
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        file['fileName'],
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        file['fileSize'],
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        file['filePath'],
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Image ${index + 1}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "120 kB",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "/storage/....",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         Container(
@@ -218,7 +266,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                     ),
                   );
                 },
-                itemCount: 10,
+                itemCount: savedFiles.length,
               ),
             ),
             SizedBox(height: 14),
