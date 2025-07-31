@@ -15,7 +15,6 @@ void main() {
     DeviceInfo.init();
   });
 
-  print(DeviceInfo.maxSize);
   runApp(const MyApp());
 }
 

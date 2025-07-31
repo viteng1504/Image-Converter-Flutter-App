@@ -1,7 +1,9 @@
+import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 
@@ -37,24 +39,8 @@ class ConvertApi {
       int imageWidth = imageSize.width;
       int imageHeight = imageSize.height;
 
-      final int imageMaxSize = max(imageWidth, imageHeight);
-
       //decrease size if image too big
       Uint8List resizeImage = bytes;
-
-      // if (imageMaxSize > maxSize) {
-      //   double scale = maxSize / imageMaxSize;
-      //   resizeImage = await FlutterImageCompress.compressWithList(
-      //     bytes,
-      //     minHeight: (imageHeight * scale).toInt(),
-      //     minWidth: (imageWidth * scale).toInt(),
-      //     quality: 90,
-      //   );
-      // }
-
-      print(
-        "imageListimageListimageListimageListimageListimageListimageListimageListimageListimageListimageList",
-      );
 
       // add to list
       imageList.add(
@@ -76,13 +62,9 @@ class ConvertApi {
     required ConvertMode convertMode,
   }) async {
     Uint8List compressed;
-    final bytes = originalImage.bytes;
+    Uint8List bytes = originalImage.bytes;
     final width = originalImage.width;
     final height = originalImage.height;
-
-    print(
-      "compress image compress image compress image compress image compress image compress image convert ${bytes.length == width * height * 3}",
-    );
 
     //change image size if too big (bigger than screen size)
     final double newScale = DeviceInfo.maxSize / max(width, height);
@@ -103,6 +85,14 @@ class ConvertApi {
       _ => CompressFormat.jpeg,
     };
 
+    if (isGrayScale) {
+      bytes = await DeviceInfo.pool.withResource(() async {
+        return await grayscaleWorker(bytes, convertMode);
+      });
+    } else {
+      bytes = originalImage.bytes;
+    }
+
     if (format == CompressFormat.png) {
       compressed = await FlutterImageCompress.compressWithList(
         bytes,
@@ -118,8 +108,25 @@ class ConvertApi {
       );
     }
 
-    print("compress image convert ${compressed.length}");
-
     return compressed;
+  }
+
+  Future<Uint8List> grayscaleWorker(Uint8List bytes, ConvertMode convertMode) {
+    return Isolate.run(() {
+      print(
+        "________________________________________________________________________________________________________________________grayIam",
+      );
+      final decoded = img.decodeImage(bytes);
+      if (decoded == null) return bytes;
+
+      final grayImage = img.grayscale(decoded);
+
+      return switch (convertMode) {
+        ConvertMode.jpg => Uint8List.fromList(img.encodeJpg(grayImage)),
+        ConvertMode.png => Uint8List.fromList(img.encodePng(grayImage)),
+        ConvertMode.webp => Uint8List.fromList(img.encodePng(grayImage)),
+        _ => Uint8List.fromList(img.encodeJpg(grayImage)),
+      };
+    });
   }
 }

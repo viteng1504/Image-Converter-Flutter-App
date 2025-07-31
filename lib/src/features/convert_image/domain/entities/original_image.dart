@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 class OriginalImage {
-  final Uint8List bytes;
+  Uint8List bytes;
   final String name;
   int width;
   int height;
@@ -16,5 +16,9 @@ class OriginalImage {
   void changedImageSize(int width, int height) {
     this.width = width;
     this.height = height;
+  }
+
+  void onChangeBytes(Uint8List bytes) {
+    this.bytes = bytes;
   }
 }

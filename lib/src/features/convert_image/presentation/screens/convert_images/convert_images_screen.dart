@@ -5,8 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../../../../../core/device_info.dart';
-import '../../../../../core/enums/convert_mode.dart';
-import '../../../../../core/resources/app_colors.dart';
+import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';
@@ -16,7 +15,7 @@ import '../../blocs/convert_images/image_display_cubit.dart';
 import '../../blocs/convert_images/image_display_state.dart';
 import 'convert_to_pdf.dart';
 import 'widgets/convert_button.dart';
-import 'widgets/convert_mode_button.dart';
+import 'widgets/convert_mode_bar.dart';
 import 'widgets/display_image.dart';
 import 'widgets/select_mode.dart';
 
@@ -34,7 +33,7 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
   @override
   void initState() {
     super.initState();
-
+    //get device max size
     if (DeviceInfo.maxSize == 0) {
       DeviceInfo.init();
     }
@@ -87,69 +86,6 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Expanded(
-                      //   child: SingleChildScrollView(
-                      //     child: Column(
-                      //       children:
-                      //           state.images.asMap().entries.map((entry) {
-                      //             final index = entry.key;
-                      //             final originalImage = entry.value;
-
-                      //             final Uint8List bytes = originalImage.bytes;
-                      //             final String size = Utils.formatSize(
-                      //               bytes.length,
-                      //             );
-
-                      //             return BlocProvider(
-                      //               key: ValueKey(
-                      //                 "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
-                      //               ),
-                      //               create:
-                      //                   (context) => ImageDisplayCubit(
-                      //                     convertImageUsecase,
-                      //                   )..convertImage(
-                      //                     bytes: bytes,
-                      //                     compressAmount: state.compressAmount,
-                      //                     isGrayScale: state.isGrayScale,
-                      //                     convertMode: state.convertMode,
-                      //                   ),
-                      //               child: BlocBuilder<
-                      //                 ImageDisplayCubit,
-                      //                 ImageDisplayState
-                      //               >(
-                      //                 builder: (context, imageState) {
-                      //                   return DisplayImage(
-                      //                     bytes: imageState.image,
-                      //                     size:
-                      //                         imageState.size ??
-                      //                         "Loading file size",
-                      //                     isLoadingImage:
-                      //                         imageState.isLoadingImage,
-                      //                     isLoadingSize:
-                      //                         imageState.isLoadingSize,
-                      //                   );
-                      //                 },
-                      //               ),
-                      //             );
-                      //           }).toList(),
-                      //     ),
-                      //   ),
-                      //   // GridView.builder(
-                      //   //   gridDelegate:
-                      //   //       SliverGridDelegateWithFixedCrossAxisCount(
-                      //   //         crossAxisCount:
-                      //   //             widget.images.length == 1 ? 1 : 2,
-                      //   //         mainAxisSpacing: 16,
-                      //   //         crossAxisSpacing: 16,
-                      //   //         childAspectRatio: 0.9,
-                      //   //       ),
-                      //   //   itemCount: widget.images.length,
-                      //   //   itemBuilder: (context, index) {
-
-                      //   //     // return const SizedBox();
-                      //   //   },
-                      //   // ),
-                      // ),
                       Expanded(
                         child: GridView.builder(
                           gridDelegate:
@@ -162,13 +98,6 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               ),
                           itemCount: widget.images.length,
                           itemBuilder: (context, index) {
-                            // final OriginalImage image = state.images[index];
-                            // Uint8List bytes =
-                            //     state.compressAmount != 0 &&
-                            //             image.halfSizeImagebytes != null
-                            //         ? image.halfSizeImagebytes!
-                            //         : image.bytes;
-
                             return BlocProvider.value(
                               value: cubits[index],
                               key: ValueKey(
@@ -180,23 +109,17 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                 ImageDisplayState
                               >(
                                 builder: (imageContext, imageState) {
-                                  // if (imageState.isLoadingImage) {
-                                  //   // Đang convert ảnh mới → hiển thị loading rõ ràng
-                                  //   return const Center(
-                                  //     child: CircularProgressIndicator(),
-                                  //   );
-                                  // }
                                   return DisplayImage(
                                     bytes: imageState.image,
                                     size:
                                         imageState.size ?? "Loading file size",
                                     isLoadingImage: imageState.isLoadingImage,
                                     isLoadingSize: imageState.isLoadingSize,
+                                    isGrayScale: state.isGrayScale,
                                   );
                                 },
                               ),
                             );
-                            // return const SizedBox();
                           },
                         ),
                       ),
@@ -215,75 +138,12 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                       const SizedBox(height: 16),
 
                       //Select Convert Mode
-                      Container(
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 2,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ConvertModeButton(
-                                onPressed: () {
-                                  if (state.convertMode != ConvertMode.jpg) {
-                                    context
-                                        .read<ConvertImagesCubit>()
-                                        .onSelectConvertMode(ConvertMode.jpg);
-                                  }
-                                },
-                                label: "JPG",
-                                isSelected:
-                                    state.convertMode == ConvertMode.jpg,
-                                isFirst: true,
-                              ),
-                              ConvertModeButton(
-                                onPressed: () {
-                                  if (state.convertMode != ConvertMode.png) {
-                                    context
-                                        .read<ConvertImagesCubit>()
-                                        .onSelectConvertMode(ConvertMode.png);
-                                  }
-                                },
-                                label: "PNG",
-                                isSelected:
-                                    state.convertMode == ConvertMode.png,
-                                isFirst: false,
-                              ),
-                              ConvertModeButton(
-                                onPressed: () {
-                                  if (state.convertMode != ConvertMode.webp) {
-                                    context
-                                        .read<ConvertImagesCubit>()
-                                        .onSelectConvertMode(ConvertMode.webp);
-                                  }
-                                },
-                                label: "WEBP",
-                                isSelected:
-                                    state.convertMode == ConvertMode.webp,
-                                isFirst: false,
-                              ),
-                              ConvertModeButton(
-                                onPressed: () {
-                                  if (state.convertMode != ConvertMode.pdf) {
-                                    context
-                                        .read<ConvertImagesCubit>()
-                                        .onSelectConvertMode(ConvertMode.pdf);
-                                  }
-                                },
-                                label: "PDF",
-                                isSelected:
-                                    state.convertMode == ConvertMode.pdf,
-                                isFirst: false,
-                              ),
-                            ],
-                          ),
-                        ),
+                      ConvertModeBar(
+                        convertMode: state.convertMode,
+                        onPressed:
+                            context
+                                .read<ConvertImagesCubit>()
+                                .onSelectConvertMode,
                       ),
 
                       const SizedBox(height: 16),
@@ -294,6 +154,12 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                           context
                               .read<ConvertImagesCubit>()
                               .onCompressionAmountChanged(value.toInt());
+                        },
+                        isGrayScaleChecked: state.isGrayScale,
+                        onChecked: (isChecked) {
+                          context
+                              .read<ConvertImagesCubit>()
+                              .onGrayScalePressed();
                         },
                       ),
 

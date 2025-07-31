@@ -6,7 +6,14 @@ enum Mode { compress, other }
 
 class SelectMode extends StatefulWidget {
   final Function(double) onChangedEnd;
-  const SelectMode({super.key, required this.onChangedEnd});
+  final Function(bool?) onChecked;
+  final bool isGrayScaleChecked;
+  const SelectMode({
+    super.key,
+    required this.isGrayScaleChecked,
+    required this.onChangedEnd,
+    required this.onChecked,
+  });
 
   @override
   _SelectModeState createState() => _SelectModeState();
@@ -14,15 +21,7 @@ class SelectMode extends StatefulWidget {
 
 class _SelectModeState extends State<SelectMode> {
   Mode _modeSelected = Mode.compress;
-  bool _checkValue = false;
-  // double value = .sliderValue;
   double sliderValue = 0;
-
-  void onCheckValueChanged() {
-    setState(() {
-      _checkValue = !_checkValue;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,10 +154,8 @@ class _SelectModeState extends State<SelectMode> {
                   }
                   return Colors.transparent;
                 }),
-                value: _checkValue,
-                onChanged: (value) {
-                  onCheckValueChanged();
-                },
+                value: widget.isGrayScaleChecked,
+                onChanged: widget.onChecked,
               ),
               const Text(
                 "Gray scale (black and white)",
@@ -202,7 +199,7 @@ class _SelectModeState extends State<SelectMode> {
                 ),
                 child: SizedBox(width: 7, height: 7),
               ),
-            if (mode == Mode.other && _checkValue == true)
+            if (mode == Mode.other && widget.isGrayScaleChecked == true)
               const DecoratedBox(
                 decoration: BoxDecoration(
                   color: AppColors.primary,

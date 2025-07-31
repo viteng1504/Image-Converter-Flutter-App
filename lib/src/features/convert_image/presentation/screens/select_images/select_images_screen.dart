@@ -21,7 +21,6 @@ class SelectImagesScreen extends StatelessWidget {
     final deviceWidth = physicalScreenSize.width.toInt();
     final deviceHeight = physicalScreenSize.height.toInt();
     DeviceInfo.maxSize = max(deviceWidth, deviceHeight);
-    print(DeviceInfo.maxSize);
     // final logicalSize = MediaQuery.of(context).size;
     // final pixelRatio = MediaQuery.of(context).devicePixelRatio;
 

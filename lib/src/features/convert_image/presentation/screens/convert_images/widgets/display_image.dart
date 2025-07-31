@@ -8,12 +8,14 @@ class DisplayImage extends StatefulWidget {
   final String size;
   final bool isLoadingImage;
   final bool isLoadingSize;
+  final bool isGrayScale;
   const DisplayImage({
     super.key,
     this.bytes,
     required this.size,
     required this.isLoadingImage,
     required this.isLoadingSize,
+    required this.isGrayScale,
   });
 
   @override
@@ -36,7 +38,7 @@ class _DisplayImageState extends State<DisplayImage> {
             ClipRRect(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
               child:
-                  (widget.isLoadingImage)
+                  (widget.isLoadingImage || widget.bytes == null)
                       ? const ColoredBox(
                         color: AppColors.indicatorDot,
                         child: Center(
@@ -45,29 +47,35 @@ class _DisplayImageState extends State<DisplayImage> {
                           ),
                         ),
                       )
-                      : Image.memory(
-                        widget.bytes!,
-                        fit: BoxFit.cover,
-                        height: double.infinity,
-                        width: double.infinity,
-                        // gaplessPlayback: true,
-                        frameBuilder: (
-                          context,
-                          child,
-                          frame,
-                          wasSynchronouslyLoaded,
-                        ) {
-                          //loading if image.memory doenst finish decoding
-                          if (wasSynchronouslyLoaded || frame != null) {
-                            return child;
-                          } else {
-                            return const Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            ); //
-                          }
-                        },
+                      : ColorFiltered(
+                        colorFilter: const ColorFilter.mode(
+                          Colors.transparent,
+                          BlendMode.dst,
+                        ),
+                        child: Image.memory(
+                          widget.bytes!,
+                          fit: BoxFit.cover,
+                          height: double.infinity,
+                          width: double.infinity,
+                          // gaplessPlayback: true,
+                          frameBuilder: (
+                            context,
+                            child,
+                            frame,
+                            wasSynchronouslyLoaded,
+                          ) {
+                            //loading if image.memory doenst finish decoding
+                            if (wasSynchronouslyLoaded || frame != null) {
+                              return child;
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                              ); //
+                            }
+                          },
+                        ),
                       ),
             ),
             Positioned(

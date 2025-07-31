@@ -1,5 +1,9 @@
+import 'dart:isolate';
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image/image.dart' as img;
 
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../domain/entities/original_image.dart';
@@ -16,6 +20,15 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
   void isLoadingFalse() {
     emit(state.copyWith(isConvertingImageToBytes: false));
+  }
+
+  String buildImageKeyMap({
+    required int index,
+    required ConvertMode convertMode,
+    required int compressAmount,
+    required bool isGrayScale,
+  }) {
+    return "i${index}_m${convertMode.name}_ca${compressAmount}_gr$isGrayScale";
   }
 
   //create cubit list for each image
@@ -53,6 +66,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
   //select convert mode
   void onSelectConvertMode(ConvertMode convertMode) async {
+    print("-----------------------------------------------${convertMode.name}");
     emit(state.copyWith(convertMode: convertMode));
 
     for (int i = 0; i < state.cubits.length; i++) {
@@ -63,7 +77,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         originalImage: image,
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
-        convertMode: convertMode,
+        convertMode: state.convertMode,
       );
     }
   }
@@ -85,6 +99,45 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
           convertMode: state.convertMode,
         );
     }
+  }
+
+  // isGrayScale checked
+  void onGrayScalePressed() {
+    final newIsGrayScale = !state.isGrayScale;
+    final convertMode = state.convertMode;
+    final compressAmount = state.compressAmount;
+    final cubits = state.cubits;
+    final images = state.images;
+
+    emit(state.copyWith(isGrayScale: newIsGrayScale));
+
+    for (int i = 0; i < cubits.length; i++) {
+      final image = images[i];
+      final cubit = cubits[i];
+
+      cubit.convertImage(
+        originalImage: image,
+        compressAmount: compressAmount,
+        isGrayScale: newIsGrayScale,
+        convertMode: convertMode,
+      );
+    }
+  }
+
+  Future<Uint8List> grayscaleWorker(Uint8List bytes, ConvertMode convertMode) {
+    return Isolate.run(() {
+      final decoded = img.decodeImage(bytes);
+      if (decoded == null) return bytes;
+
+      final grayImage = img.grayscale(decoded);
+
+      return switch (convertMode) {
+        ConvertMode.jpg => Uint8List.fromList(img.encodeJpg(grayImage)),
+        ConvertMode.png => Uint8List.fromList(img.encodePng(grayImage)),
+        ConvertMode.webp => Uint8List.fromList(img.encodePng(grayImage)),
+        _ => Uint8List.fromList(img.encodeJpg(grayImage)),
+      };
+    });
   }
 
   // Future<void> convertImage({

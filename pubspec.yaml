@@ -54,6 +54,7 @@ dependencies:
   syncfusion_flutter_pdf: ^30.1.42
   open_file: ^3.5.10
   image_size_getter: ^2.4.0
+  pool: ^1.5.1
 
 dev_dependencies:
   flutter_test:

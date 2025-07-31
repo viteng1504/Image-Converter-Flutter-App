@@ -38,13 +38,6 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     required ConvertMode convertMode,
   }) async {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
-    // if (state.cachedImage == null) {
-    //   print("bi convert asdfaosjdfasodifjasdoifajdsf");
-    //   emit(state.copyWith(cachedImage: state.image));
-
-    //   return;
-    // }
-    // print(listEquals(state.cachedImage, state.image));
 
     final image = await convertImageUsecase.convertImage(
       originalImage: originalImage,
@@ -52,8 +45,6 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
       isGrayScale: isGrayScale,
       convertMode: convertMode,
     );
-
-    print("Dung luong : ${state.size}");
 
     emit(
       state.copyWith(
@@ -66,12 +57,38 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     );
   }
 
-  Future<void> onGrayScaling() async {
-    
+  Future<void> onGrayScaling({
+    required OriginalImage originalImage,
+    required int compressAmount,
+    required bool isGrayScale,
+    required ConvertMode convertMode,
+  }) async {
+    emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
+
+    final image = await convertImageUsecase.convertImage(
+      originalImage: originalImage,
+      compressAmount: compressAmount,
+      isGrayScale: isGrayScale,
+      convertMode: convertMode,
+    );
+
+    emit(
+      state.copyWith(
+        image: image,
+        // cachedImage: image,
+        size: Utils.formatSize(image.length),
+        isLoadingSize: false,
+        isLoadingImage: false,
+      ),
+    );
   }
 
   void onLoading() {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
+  }
+
+  void onGrayScaleLoading() {
+    emit(state.copyWith(isLoadingImage: false, isLoadingSize: true));
   }
 
   void onStopLoading() {
