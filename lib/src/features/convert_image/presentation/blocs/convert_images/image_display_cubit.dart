@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -31,7 +32,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
 
   // void saveImageState()
 
-  Future<void> convertImage({
+  Future<Uint8List> convertImage({
     required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
@@ -46,6 +47,23 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
       convertMode: convertMode,
     );
 
+    print(
+      "________________________________________________________________________________${image.length}",
+    );
+
+    // emit(
+    //   state.copyWith(
+    //     image: image,
+    //     // cachedImage: image,
+    //     size: Utils.formatSize(image.length),
+    //     isLoadingImage: false,
+    //     isLoadingSize: false,
+    //   ),
+    // );
+    return image;
+  }
+
+  void updateImageUI(Uint8List image) {
     emit(
       state.copyWith(
         image: image,

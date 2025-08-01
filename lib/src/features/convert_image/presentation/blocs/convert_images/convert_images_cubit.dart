@@ -1,9 +1,7 @@
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:image/image.dart' as img;
 
 import '../../../../../core/enums/convert_mode.dart';
 import '../../../domain/entities/original_image.dart';
@@ -13,7 +11,8 @@ import 'image_display_cubit.dart';
 
 class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   ConvertImageUsecase convertImageUsecase;
-  final List<ImageDisplayCubit> cubits = [];
+  final Map<String, Uint8List> cachedImages = {};
+  final Set<String> convertingImageKeys = {};
 
   ConvertImagesCubit(this.convertImageUsecase)
     : super(ConvertImagesState.initial());
@@ -35,18 +34,44 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   Future<void> onCreateImageDisplayCubits(
     List<OriginalImage> originalImages,
   ) async {
+    final isGrayScale = state.isGrayScale;
+    final oldConvertMode = state.convertMode;
+    final compressAmount = state.compressAmount;
+    int i = 0;
+    final List<ImageDisplayCubit> cubits = [];
+
     for (final image in originalImages) {
-      final cubit = ImageDisplayCubit(convertImageUsecase)..convertImage(
+      final key = buildImageKeyMap(
+        index: i,
+        convertMode: state.convertMode,
+        compressAmount: state.compressAmount,
+        isGrayScale: state.isGrayScale,
+      );
+      final cubit = ImageDisplayCubit(convertImageUsecase);
+
+      convertingImageKeys.add(key);
+
+      final convertedImage = await cubit.convertImage(
         originalImage: image,
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
         convertMode: state.convertMode,
       );
 
+      cachedImages[key] = convertedImage;
+      convertingImageKeys.remove(key);
+
+      if (isGrayScale == state.isGrayScale &&
+          compressAmount == state.compressAmount &&
+          oldConvertMode == state.convertMode) {
+        cubit.updateImageUI(convertedImage);
+      }
+
       cubits.add(cubit);
+      i++;
     }
 
-    emit(state.copyWith(cubits: cubits));
+    emit(state.copyWith(cubits: cubits, images: originalImages));
   }
 
   //convert to original images from xfiles
@@ -56,114 +81,91 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     final List<OriginalImage> originalImages = await convertImageUsecase
         .encodeImage(imageXFiles);
 
+    await onCreateImageDisplayCubits(originalImages);
     emit(state.copyWith(isConvertingImageToBytes: false));
 
-    await onCreateImageDisplayCubits(originalImages);
-
     print(originalImages.length);
-    emit(state.copyWith(images: originalImages));
   }
 
   //select convert mode
-  void onSelectConvertMode(ConvertMode convertMode) async {
-    print("-----------------------------------------------${convertMode.name}");
-    emit(state.copyWith(convertMode: convertMode));
+
+  void onImageConversionOptionChanged({
+    ConvertMode? convertMode,
+    bool? isGrayScale,
+    int? compressAmount,
+  }) async {
+    final newConvertMode = convertMode ?? state.convertMode;
+    final newIsGrayScale = isGrayScale ?? state.isGrayScale;
+    final newCompressAmount = compressAmount ?? state.compressAmount;
+
+    emit(
+      state.copyWith(
+        convertMode: newConvertMode,
+        isGrayScale: newIsGrayScale,
+        compressAmount: newCompressAmount,
+      ),
+    );
+
+    // loading all image
+    for (final cubit in state.cubits) {
+      cubit.onLoading();
+    }
 
     for (int i = 0; i < state.cubits.length; i++) {
-      final image = state.images[i];
+      final index = i;
+      final cubit = state.cubits[index];
+      final image = state.images[index];
 
-      final cubit = state.cubits[i];
-      cubit.convertImage(
-        originalImage: image,
-        compressAmount: state.compressAmount,
-        isGrayScale: state.isGrayScale,
-        convertMode: state.convertMode,
+      final key = buildImageKeyMap(
+        index: index,
+        convertMode: newConvertMode,
+        compressAmount: newCompressAmount,
+        isGrayScale: newIsGrayScale,
       );
+
+      if (cachedImages.containsKey(key)) {
+        cubit.updateImageUI(cachedImages[key]!);
+        continue;
+      }
+
+      if (convertingImageKeys.contains(key)) continue;
+
+      Future(() async {
+        final convertedImage = await cubit.convertImage(
+          originalImage: image,
+          compressAmount: newCompressAmount,
+          isGrayScale: newIsGrayScale,
+          convertMode: newConvertMode,
+        );
+
+        convertingImageKeys.add(key);
+        cachedImages[key] = convertedImage;
+        convertingImageKeys.remove(key);
+        cubit.updateImageUI(convertedImage);
+
+        // check if state is changed
+        // if (state.isGrayScale == newIsGrayScale &&
+        //     state.convertMode == newConvertMode &&
+        //     state.compressAmount == newCompressAmount) {}
+      });
     }
+  }
+
+  //
+  void onSelectConvertMode(ConvertMode convertMode) {
+    onImageConversionOptionChanged(convertMode: convertMode);
   }
 
   // compression amount changed
   void onCompressionAmountChanged(int value) {
-    emit(state.copyWith(compressAmount: value));
-
-    for (int i = 0; i < state.cubits.length; i++) {
-      final image = state.images[i];
-
-      final cubit = state.cubits[i];
-      cubit
-        ..onLoading()
-        ..convertImage(
-          originalImage: image,
-          compressAmount: state.compressAmount,
-          isGrayScale: state.isGrayScale,
-          convertMode: state.convertMode,
-        );
-    }
+    onImageConversionOptionChanged(compressAmount: value);
   }
 
   // isGrayScale checked
   void onGrayScalePressed() {
-    final newIsGrayScale = !state.isGrayScale;
-    final convertMode = state.convertMode;
-    final compressAmount = state.compressAmount;
-    final cubits = state.cubits;
-    final images = state.images;
-
-    emit(state.copyWith(isGrayScale: newIsGrayScale));
-
-    for (int i = 0; i < cubits.length; i++) {
-      final image = images[i];
-      final cubit = cubits[i];
-
-      cubit.convertImage(
-        originalImage: image,
-        compressAmount: compressAmount,
-        isGrayScale: newIsGrayScale,
-        convertMode: convertMode,
-      );
-    }
+    onImageConversionOptionChanged(isGrayScale: !state.isGrayScale);
+    print(
+      "grayScale ______________________________________________________${state.isGrayScale}",
+    );
   }
-
-  Future<Uint8List> grayscaleWorker(Uint8List bytes, ConvertMode convertMode) {
-    return Isolate.run(() {
-      final decoded = img.decodeImage(bytes);
-      if (decoded == null) return bytes;
-
-      final grayImage = img.grayscale(decoded);
-
-      return switch (convertMode) {
-        ConvertMode.jpg => Uint8List.fromList(img.encodeJpg(grayImage)),
-        ConvertMode.png => Uint8List.fromList(img.encodePng(grayImage)),
-        ConvertMode.webp => Uint8List.fromList(img.encodePng(grayImage)),
-        _ => Uint8List.fromList(img.encodeJpg(grayImage)),
-      };
-    });
-  }
-
-  // Future<void> convertImage({
-  //   required Uint8List bytes,
-  //   required int compressAmount,
-  //   required bool isGrayScale,
-  //   required ConvertMode convertMode,
-  // }) async {
-  //   emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
-
-  //   final image = await convertImageUsecase.convertImage(
-  //     bytes: bytes,
-  //     compressAmount: compressAmount,
-  //     isGrayScale: isGrayScale,
-  //     convertMode: convertMode,
-  //   );
-
-  //   print("Dung luong : ${state.size}");
-
-  //   emit(
-  //     state.copyWith(
-  //       image: image,
-  //       size: Utils.formatSize(image.length),
-  //       isLoadingImage: false,
-  //       isLoadingSize: false,
-  //     ),
-  //   );
-  // }
 }
