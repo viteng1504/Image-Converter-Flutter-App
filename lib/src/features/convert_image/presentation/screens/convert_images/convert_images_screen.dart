@@ -18,6 +18,7 @@ import 'convert_to_pdf.dart';
 import 'widgets/convert_button.dart';
 import 'widgets/convert_mode_bar.dart';
 import 'widgets/display_image.dart';
+import 'widgets/reorderable_grid_view.dart';
 import 'widgets/select_mode.dart';
 
 class ConvertImagesScreen extends StatefulWidget {
@@ -64,7 +65,8 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
         listener: (context, state) {},
         builder: (context, state) {
           final cubits = context.watch<ConvertImagesCubit>().state.cubits;
-
+          final List<Uint8List?> imageBytesList =
+              cubits.map((cubit) => cubit.state.image).toList();
           return state.isConvertingImageToBytes
               ? const Scaffold(
                 body: Center(
@@ -87,43 +89,51 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount:
-                                    widget.images.length == 1 ? 1 : 2,
-                                mainAxisSpacing: 16,
-                                crossAxisSpacing: 16,
-                                childAspectRatio: 0.9,
-                              ),
-                          itemCount: widget.images.length,
-                          itemBuilder: (context, index) {
-                            return BlocProvider.value(
-                              value: cubits[index],
-                              key: ValueKey(
-                                "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
-                              ),
+                      state.convertMode == ConvertMode.pdf
+                          ? Expanded(
+                            child: ReorderableGridView(
+                              imagesBytes: imageBytesList,
+                            ),
+                          )
+                          : Expanded(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount:
+                                        widget.images.length == 1 ? 1 : 2,
+                                    mainAxisSpacing: 16,
+                                    crossAxisSpacing: 16,
+                                    childAspectRatio: 0.9,
+                                  ),
+                              itemCount: widget.images.length,
+                              itemBuilder: (context, index) {
+                                return BlocProvider.value(
+                                  value: cubits[index],
+                                  key: ValueKey(
+                                    "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
+                                  ),
 
-                              child: BlocBuilder<
-                                ImageDisplayCubit,
-                                ImageDisplayState
-                              >(
-                                builder: (imageContext, imageState) {
-                                  return DisplayImage(
-                                    bytes: imageState.image,
-                                    size:
-                                        imageState.size ?? "Loading file size",
-                                    isLoadingImage: imageState.isLoadingImage,
-                                    isLoadingSize: imageState.isLoadingSize,
-                                    isGrayScale: state.isGrayScale,
-                                  );
-                                },
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                                  child: BlocBuilder<
+                                    ImageDisplayCubit,
+                                    ImageDisplayState
+                                  >(
+                                    builder: (imageContext, imageState) {
+                                      return DisplayImage(
+                                        bytes: imageState.image,
+                                        size:
+                                            imageState.size ??
+                                            "Loading file size",
+                                        isLoadingImage:
+                                            imageState.isLoadingImage,
+                                        isLoadingSize: imageState.isLoadingSize,
+                                        isGrayScale: state.isGrayScale,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
 
                       const SizedBox(height: 20),
 
