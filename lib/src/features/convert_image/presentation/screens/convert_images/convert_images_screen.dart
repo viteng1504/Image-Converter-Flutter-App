@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -71,7 +70,10 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
           final cubits = context.watch<ConvertImagesCubit>().state.cubits;
           final List<Uint8List?> imageBytesList =
               cubits.map((cubit) => cubit.state.image).toList();
-          return state.isConvertingImageToBytes
+          return context
+                  .watch<ConvertImagesCubit>()
+                  .state
+                  .isConvertingImageToBytes
               ? const Scaffold(
                 body: Center(
                   child: CircularProgressIndicator(color: AppColors.primary),
@@ -181,10 +183,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                       Center(
                         child: ConvertButton(
                           onPressed: () async {
-                            final savedFiles =
-                                await context
-                                    .read<ConvertImagesCubit>()
-                                    .onConvertToFile();
+                            await context
+                                .read<ConvertImagesCubit>()
+                                .onConvertToFile(context);
                             // if (state.convertMode == ConvertMode.pdf) {
                             //   final List<Uint8List> imageBytesList =
                             //       state.images
@@ -195,14 +196,14 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                             //     imageBytesList,
                             //   );
                             // }
-                            Navigator.pushNamed(
-                              context,
-                              "/saved_files",
-                              arguments: {
-                                "savedFiles": savedFiles,
-                                // "firstImage": firstImage,
-                              },
-                            );
+                            // Navigator.pushNamed(
+                            //   context,
+                            //   "/saved_files",
+                            //   arguments: {
+                            //     "savedFiles": savedFiles,
+                            //     // "firstImage": firstImage,
+                            //   },
+                            // );
                           },
                         ),
                       ),

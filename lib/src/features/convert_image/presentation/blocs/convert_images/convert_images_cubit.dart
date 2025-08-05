@@ -2,8 +2,8 @@
 import 'dart:io';
 
 // Flutter imports:
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 // Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -138,6 +138,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       }
 
       if (convertingImageKeys.contains(key)) continue;
+      convertingImageKeys.add(key);
 
       Future(() async {
         final convertedImage = await cubit.convertImage(
@@ -147,7 +148,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
           convertMode: newConvertMode,
         );
 
-        convertingImageKeys.add(key);
         cachedImages[key] = convertedImage;
         convertingImageKeys.remove(key);
 
@@ -214,12 +214,17 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     }
   }
 
-  Future<List<SavedFile>> onConvertToFile() async {
+  Future<void> onConvertToFile(BuildContext context) async {
     emit(state.copyWith(isConvertingImageToBytes: true));
 
     final List<SavedFile> savedFiles = [];
 
-    while (convertingImageKeys.isNotEmpty) {}
+    while (convertingImageKeys.isNotEmpty) {
+      await Future.delayed(const Duration(milliseconds: 5000));
+      if (convertingImageKeys.isEmpty) {
+        break;
+      }
+    }
     final convertMode = state.convertMode;
 
     //Check convert to image or pdf
@@ -303,6 +308,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         final imageName = state.images[i].name;
 
         if (image != null) {
+          print(state.convertMode);
           final savedFile = await convertImageUsecase.convertToImage(
             convertMode: convertMode,
             image: image,
@@ -317,6 +323,18 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
     emit(state.copyWith(isConvertingImageToBytes: false));
 
-    return savedFiles;
+    if (state.isConvertingImageToBytes == false &&
+        convertingImageKeys.isEmpty) {
+      await Navigator.pushNamed(
+        context,
+        "/saved_files",
+        arguments: {
+          "savedFiles": savedFiles,
+          // "firstImage": firstImage,
+        },
+      );
+    }
+
+    // return savedFiles;
   }
 }

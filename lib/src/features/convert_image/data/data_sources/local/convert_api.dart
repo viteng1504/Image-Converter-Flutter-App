@@ -140,21 +140,26 @@ class ConvertApi {
 
   //convert to image and save in gallery
 
-  Future<String> createUniquePath(
+  Future<Map<String, String>> createUniquePath(
     String fileName,
     String storagePath,
     String extensionName,
   ) async {
+    print("extension Name $extensionName");
     final baseFileName = path.basenameWithoutExtension(fileName);
 
     String newPath = path.join(storagePath, fileName);
+    String imageName = fileName;
     int index = 1;
     while (await File(newPath).exists()) {
-      newPath = path.join(storagePath, "$baseFileName ($index)$extensionName");
+      imageName = "$baseFileName ($index)$extensionName";
+      newPath = path.join(storagePath, imageName);
       index++;
     }
 
-    return newPath;
+    Map<String, String> map = {"imagePath": newPath, "imageName": imageName};
+
+    return map;
   }
 
   String getExtensionFromConvertMode(ConvertMode mode) {
@@ -166,7 +171,7 @@ class ConvertApi {
       case ConvertMode.webp:
         return 'webp';
       default:
-        return 'jpg';
+        return 'png';
     }
   }
 
@@ -176,23 +181,27 @@ class ConvertApi {
     required String imageName,
     required String storagePath,
   }) async {
-    final imagePath = await createUniquePath(
+    final map = await createUniquePath(
       imageName,
       storagePath,
       ".${getExtensionFromConvertMode(convertMode)}",
     );
 
-    print(imagePath);
+    final imagePath = map["imagePath"];
+    if (imagePath == null || imagePath.isEmpty) {
+      throw Exception(
+        "imagePath is null or empty. Check createUniquePath on ConvertApi",
+      );
+    }
 
     //save image to file
-    print(123);
     await File(imagePath).writeAsBytes(image);
 
     await MediaScanner.loadMedia(path: imagePath);
 
     return SavedFile(
       image: image,
-      name: imageName,
+      name: map["imageName"]!,
       size: Utils.formatSize(image.length),
       path: imagePath,
     );
