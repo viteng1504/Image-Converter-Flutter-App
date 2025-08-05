@@ -22,7 +22,7 @@ import 'image_display_cubit.dart';
 
 class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   ConvertImageUsecase convertImageUsecase;
-  final Map<String, Uint8List> cachedImages = {};
+  final Map<String, Uint8List?> cachedImages = {};
   final Set<String> convertingImageKeys = {};
 
   ConvertImagesCubit(this.convertImageUsecase)
@@ -38,6 +38,9 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     required int compressAmount,
     required bool isGrayScale,
   }) {
+    if (convertMode == ConvertMode.pdf) {
+      convertMode = ConvertMode.jpg;
+    }
     return "i${index}_m${convertMode.name}_ca${compressAmount}_gr$isGrayScale";
   }
 
@@ -103,7 +106,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     bool? isGrayScale,
     int? compressAmount,
   }) async {
-    final newConvertMode = convertMode ?? state.convertMode;
+    ConvertMode newConvertMode = convertMode ?? state.convertMode;
     final newIsGrayScale = isGrayScale ?? state.isGrayScale;
     final newCompressAmount = compressAmount ?? state.compressAmount;
 
@@ -114,6 +117,10 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         compressAmount: newCompressAmount,
       ),
     );
+
+    if (newConvertMode == ConvertMode.pdf) {
+      newConvertMode = ConvertMode.jpg;
+    }
 
     // loading all image
     for (final cubit in state.cubits) {
@@ -136,6 +143,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         cubit.updateImageUI(cachedImages[key]!);
         continue;
       }
+      cachedImages[key] = null;
 
       if (convertingImageKeys.contains(key)) continue;
       convertingImageKeys.add(key);
@@ -214,13 +222,67 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     }
   }
 
+  // convert to pdf
+  Future<SavedFile> convertToPdf() async {
+    Uint8List firstImage = state.cubits[0].state.image!;
+
+    final PdfDocument document = PdfDocument();
+    for (final cubit in state.cubits) {
+      final imageBytes = cubit.state.image;
+
+      final PdfImage image = PdfBitmap(imageBytes!);
+
+      final page = document.pages.add();
+      const double imageWidth = 500;
+      const double imageHeight = 500;
+      final double pageWidth = page.getClientSize().width;
+      final double pageHeight = page.getClientSize().height;
+      final double x = (pageWidth - imageWidth) / 2;
+      final double y = (pageHeight - imageHeight) / 2;
+      page.graphics.drawImage(
+        image,
+        Rect.fromLTWH(x, y, imageWidth, imageHeight),
+      );
+    }
+
+    final List<int> bytes = await document.save();
+    document.dispose();
+
+    final downloadDir = Directory('/storage/emulated/0/Download/pdf files');
+    if (!await downloadDir.exists()) {
+      await downloadDir.create(recursive: true);
+    }
+
+    // Tạo tên file ngẫu nhiên và kiểm tra trùng
+    final randomNumber = (100 + (DateTime.now().millisecondsSinceEpoch % 900));
+    String baseName = 'MyPdf_$randomNumber';
+    String fileName = baseName;
+    int count = 1;
+    while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
+      fileName = '$baseName($count)';
+      count++;
+    }
+
+    final file = File('${downloadDir.path}/$fileName.pdf');
+
+    print("convert to pdf ${bytes.length}");
+    await file.writeAsBytes(bytes);
+
+    return SavedFile(
+      image: firstImage,
+      name: "$fileName.pdf",
+      size: Utils.formatSize(bytes.length),
+      path: "${downloadDir.path}/$fileName.pdf",
+    );
+  }
+
   Future<void> onConvertToFile(BuildContext context) async {
     emit(state.copyWith(isConvertingImageToBytes: true));
 
     final List<SavedFile> savedFiles = [];
 
     while (convertingImageKeys.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 5000));
+      await Future.delayed(const Duration(milliseconds: 2000));
       if (convertingImageKeys.isEmpty) {
         break;
       }
@@ -238,56 +300,8 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     String storagePath = await getStoragePath(convertFile);
 
     if (convertFile == ConvertFile.pdf) {
-      Uint8List firstImage = state.images[0].bytes;
-
-      final PdfDocument document = PdfDocument();
-      for (final imageBytes in state.images) {
-        final PdfImage image = PdfBitmap(imageBytes.bytes);
-
-        final page = document.pages.add();
-        const double imageWidth = 500;
-        const double imageHeight = 500;
-        final double pageWidth = page.getClientSize().width;
-        final double pageHeight = page.getClientSize().height;
-        final double x = (pageWidth - imageWidth) / 2;
-        final double y = (pageHeight - imageHeight) / 2;
-        page.graphics.drawImage(
-          image,
-          Rect.fromLTWH(x, y, imageWidth, imageHeight),
-        );
-      }
-
-      final List<int> bytes = await document.save();
-      document.dispose();
-
-      final downloadDir = Directory('/storage/emulated/0/Download/pdf files');
-      if (!await downloadDir.exists()) {
-        await downloadDir.create(recursive: true);
-      }
-
-      // Tạo tên file ngẫu nhiên và kiểm tra trùng
-      final randomNumber =
-          (100 + (DateTime.now().millisecondsSinceEpoch % 900));
-      String baseName = 'MyPdf_$randomNumber';
-      String fileName = baseName;
-      int count = 1;
-      while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
-        fileName = '$baseName($count)';
-        count++;
-      }
-
-      final file = File('${downloadDir.path}/$fileName.pdf');
-
-      savedFiles.add(
-        SavedFile(
-          image: firstImage,
-          name: "$fileName.pdf",
-          size: Utils.formatSize(bytes.length),
-          path: "${downloadDir.path}/$fileName.pdf",
-        ),
-      );
-      print("convert to pdf ${bytes.length}");
-      await file.writeAsBytes(bytes);
+      final pdfSavedFile = await convertToPdf();
+      savedFiles.add(pdfSavedFile);
     } else {
       //convert to image
 
