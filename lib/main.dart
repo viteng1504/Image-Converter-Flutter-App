@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Image Converter',
       theme: ThemeData(scaffoldBackgroundColor: AppColors.background),
-      home: const SelectImagesScreen(),
+      home: const WelcomeMainScreen(),
       routes: {
         "welcome": (context) => const WelcomeMainScreen(),
         "select_images": (context) => const SelectImagesScreen(),

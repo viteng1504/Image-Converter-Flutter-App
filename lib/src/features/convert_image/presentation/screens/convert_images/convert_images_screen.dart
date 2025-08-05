@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 import '../../../../../core/device_info.dart';
-import '../../../../../core/enums/convert_mode.dart';
 import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
@@ -14,7 +11,6 @@ import '../../blocs/convert_images/convert_images_cubit.dart';
 import '../../blocs/convert_images/convert_images_state.dart';
 import '../../blocs/convert_images/image_display_cubit.dart';
 import '../../blocs/convert_images/image_display_state.dart';
-import 'convert_to_pdf.dart';
 import 'widgets/convert_button.dart';
 import 'widgets/convert_mode_bar.dart';
 import 'widgets/display_image.dart';
@@ -177,24 +173,28 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                       Center(
                         child: ConvertButton(
                           onPressed: () async {
-                            if (state.convertMode == ConvertMode.pdf) {
-                              final List<Uint8List> imageBytesList =
-                                  state.images
-                                      .map((image) => image.bytes)
-                                      .toList();
-                              Uint8List firstImage = imageBytesList[0];
-                              final file = await Convert().convertImageToPdf(
-                                imageBytesList,
-                              );
-                              Navigator.pushNamed(
-                                context,
-                                "/saved_files",
-                                arguments: {
-                                  "pdfFile": file,
-                                  "firstImage": firstImage,
-                                },
-                              );
-                            }
+                            final savedFiles =
+                                await context
+                                    .read<ConvertImagesCubit>()
+                                    .onConvertToFile();
+                            // if (state.convertMode == ConvertMode.pdf) {
+                            //   final List<Uint8List> imageBytesList =
+                            //       state.images
+                            //           .map((image) => image.bytes)
+                            //           .toList();
+                            //   Uint8List firstImage = imageBytesList[0];
+                            //   final file = await Convert().convertImageToPdf(
+                            //     imageBytesList,
+                            //   );
+                            // }
+                            Navigator.pushNamed(
+                              context,
+                              "/saved_files",
+                              arguments: {
+                                "savedFiles": savedFiles,
+                                // "firstImage": firstImage,
+                              },
+                            );
                           },
                         ),
                       ),

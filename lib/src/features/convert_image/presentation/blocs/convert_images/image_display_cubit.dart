@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../../core/enums/convert_mode.dart';
+import '../../../../../core/enums/convert.dart';
 import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';

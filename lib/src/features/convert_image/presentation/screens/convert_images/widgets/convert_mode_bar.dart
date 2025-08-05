@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../core/enums/convert_mode.dart';
+import '../../../../../../core/enums/convert.dart';
 import '../../../../../../core/resources/app_assets.dart';
 import 'convert_mode_button.dart';
 

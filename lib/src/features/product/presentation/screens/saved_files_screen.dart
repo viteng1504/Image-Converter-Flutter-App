@@ -1,10 +1,10 @@
 import 'dart:math' as math;
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
 
 import '../../../../core/resources/app_assets.dart';
+import '../../../convert_image/domain/entities/saved_file.dart';
 
 class SavedFilesScreen extends StatefulWidget {
   const SavedFilesScreen({super.key});
@@ -30,33 +30,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final pdfFile = args["pdfFile"];
-    final Uint8List firstImage = args["firstImage"];
-    final String fileName = pdfFile.uri.pathSegments.last;
-    final int fileSize = pdfFile.lengthSync();
-    final String filePath = pdfFile.parent.path;
-    String readableSize;
-    if (fileSize < 1024) {
-      readableSize = '$fileSize B';
-    } else if (fileSize < 1024 * 1024) {
-      readableSize = '${(fileSize / 1024).toStringAsFixed(2)} kB';
-    } else if (fileSize < 1024 * 1024 * 1024) {
-      readableSize = '${(fileSize / (1024 * 1024)).toStringAsFixed(2)} mB';
-    } else if (fileSize < 1024 * 1024 * 1024 * 1024) {
-      readableSize =
-          '${(fileSize / (1024 * 1024 * 1024)).toStringAsFixed(2)} GB';
-    } else {
-      readableSize =
-          '${(fileSize / (1024 * 1024 * 1024 * 1024)).toStringAsFixed(2)} TB';
-    }
-    final List<Map<String, dynamic>> savedFiles = [
-      {
-        "fileName": fileName,
-        "fileSize": readableSize,
-        "filePath": filePath,
-        "thumbnail": firstImage,
-      },
-    ];
+    final List<SavedFile> savedFiles = args["savedFiles"];
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -143,12 +117,14 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 14),
-            SizedBox(
-              height: 480,
+            const SizedBox(height: 14),
+            Expanded(
+              // height: 480,
               child: ListView.builder(
+                itemCount: savedFiles.length,
+
                 itemBuilder: (context, index) {
-                  final file = savedFiles[index];
+                  final savedFile = savedFiles[index];
                   return Padding(
                     padding: EdgeInsets.only(bottom: index != 9 ? 8.0 : 0.0),
                     child: Column(
@@ -157,17 +133,19 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                       children: [
                         InkWell(
                           onTap: () async {
-                            final result = await OpenFile.open(pdfFile.path);
+                            final result = await OpenFile.open(savedFile.path);
                             if (result.type != ResultType.done) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Không mở được file')),
+                                const SnackBar(
+                                  content: Text('Không mở được file'),
+                                ),
                               );
                             }
                           },
                           child: Container(
                             decoration: BoxDecoration(
                               color: Colors.grey.withOpacity(0.3),
-                              borderRadius: BorderRadius.only(
+                              borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(8),
                                 topRight: Radius.circular(8),
                               ),
@@ -175,11 +153,11 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                             child: Row(
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(8),
                                   ),
                                   child: Image.memory(
-                                    file['thumbnail'],
+                                    savedFile.image,
                                     width: 120,
                                     height: 130,
                                     fit: BoxFit.cover,
@@ -193,7 +171,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        file['fileName'],
+                                        savedFile.name,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -202,18 +180,18 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        file['fileSize'],
-                                        style: TextStyle(
+                                        savedFile.size,
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        file['filePath'],
+                                        savedFile.path,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -226,7 +204,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                           ),
                         ),
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white12,
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(8),
@@ -237,26 +215,46 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.open_in_new,
                                   color: Colors.white,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final result = await OpenFile.open(
+                                    savedFile.path,
+                                  );
+                                  if (result.type != ResultType.done) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Không mở được file'),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
                               IconButton(
-                                icon: Icon(Icons.save_as, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.save_as,
+                                  color: Colors.white,
+                                ),
                                 onPressed: () {},
                               ),
                               IconButton(
                                 icon: Transform(
                                   alignment: Alignment.center,
                                   transform: Matrix4.rotationY(math.pi),
-                                  child: Icon(Icons.reply, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.reply,
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 onPressed: () {},
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
                                 onPressed: () {},
                               ),
                             ],
@@ -266,11 +264,13 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                     ),
                   );
                 },
-                itemCount: savedFiles.length,
               ),
             ),
-            SizedBox(height: 14),
-            Expanded(
+            const SizedBox(height: 14),
+
+            //bottom options
+            SizedBox(
+              height: 100,
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -292,7 +292,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.only(left: 24.0),
                         child: Row(
                           spacing: 16,
                           mainAxisAlignment: MainAxisAlignment.start,

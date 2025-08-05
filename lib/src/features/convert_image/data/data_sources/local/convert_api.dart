@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
@@ -6,10 +7,14 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
 import 'package:image_size_getter/image_size_getter.dart';
+import 'package:media_scanner/media_scanner.dart';
+import 'package:path/path.dart' as path;
 
 import '../../../../../core/device_info.dart';
-import '../../../../../core/enums/convert_mode.dart';
+import '../../../../../core/enums/convert.dart';
+import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
+import '../../../domain/entities/saved_file.dart';
 
 enum ImageFormat { png, jpg, webp, unknown }
 
@@ -128,5 +133,65 @@ class ConvertApi {
         _ => Uint8List.fromList(img.encodeJpg(grayImage)),
       };
     });
+  }
+
+  //convert to image and save in gallery
+
+  Future<String> createUniquePath(
+    String fileName,
+    String storagePath,
+    String extensionName,
+  ) async {
+    final baseFileName = path.basenameWithoutExtension(fileName);
+
+    String newPath = path.join(storagePath, fileName);
+    int index = 1;
+    while (await File(newPath).exists()) {
+      newPath = path.join(storagePath, "$baseFileName ($index)$extensionName");
+      index++;
+    }
+
+    return newPath;
+  }
+
+  String getExtensionFromConvertMode(ConvertMode mode) {
+    switch (mode) {
+      case ConvertMode.jpg:
+        return 'jpg';
+      case ConvertMode.png:
+        return 'png';
+      case ConvertMode.webp:
+        return 'webp';
+      default:
+        return 'jpg';
+    }
+  }
+
+  Future<SavedFile> convertToImage({
+    required ConvertMode convertMode,
+    required Uint8List image,
+    required String imageName,
+    required String storagePath,
+  }) async {
+    final imagePath = await createUniquePath(
+      imageName,
+      storagePath,
+      ".${getExtensionFromConvertMode(convertMode)}",
+    );
+
+    print(imagePath);
+
+    //save image to file
+    print(123);
+    await File(imagePath).writeAsBytes(image);
+
+    await MediaScanner.loadMedia(path: imagePath);
+
+    return SavedFile(
+      image: image,
+      name: imageName,
+      size: Utils.formatSize(image.length),
+      path: imagePath,
+    );
   }
 }

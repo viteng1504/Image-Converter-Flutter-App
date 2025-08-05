@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import '../../../../../core/enums/convert_mode.dart';
+import '../../../../../core/enums/convert.dart';
 import '../../../domain/entities/original_image.dart';
 import 'image_display_cubit.dart';
 

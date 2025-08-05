@@ -1,10 +1,16 @@
-import 'dart:typed_data';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-import '../../../../../core/enums/convert_mode.dart';
+import '../../../../../core/enums/convert.dart';
+import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
+import '../../../domain/entities/saved_file.dart';
 import '../../../domain/usecases/convert_image_usecase.dart';
 import 'convert_images_state.dart';
 import 'image_display_cubit.dart';
@@ -83,8 +89,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
     await onCreateImageDisplayCubits(originalImages);
     emit(state.copyWith(isConvertingImageToBytes: false));
-
-    print(originalImages.length);
   }
 
   //select convert mode
@@ -141,12 +145,13 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         convertingImageKeys.add(key);
         cachedImages[key] = convertedImage;
         convertingImageKeys.remove(key);
-        cubit.updateImageUI(convertedImage);
 
-        // check if state is changed
-        // if (state.isGrayScale == newIsGrayScale &&
-        //     state.convertMode == newConvertMode &&
-        //     state.compressAmount == newCompressAmount) {}
+        // check if state is changed to prevent emit old state
+        if (state.isGrayScale == newIsGrayScale &&
+            state.convertMode == newConvertMode &&
+            state.compressAmount == newCompressAmount) {
+          cubit.updateImageUI(convertedImage);
+        }
       });
     }
   }
@@ -167,5 +172,146 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     print(
       "grayScale ______________________________________________________${state.isGrayScale}",
     );
+  }
+
+  //get Storage path
+  Future<String> getStoragePath(ConvertFile convertFile) async {
+    final Directory? externalDir = await getExternalStorageDirectory();
+
+    if (externalDir == null) {
+      throw Exception("Cannot access external storage");
+    }
+
+    final String path = externalDir.path.split("/Android")[0];
+
+    final convertPath = switch (convertFile) {
+      ConvertFile.image => "$path/Pictures",
+      ConvertFile.pdf => "$path/Download",
+    };
+
+    print(convertPath);
+
+    return convertPath;
+  }
+
+  //check if image name exist or not
+
+  String getExtensionFromConvertMode(ConvertMode mode) {
+    switch (mode) {
+      case ConvertMode.jpg:
+        return 'jpg';
+      case ConvertMode.png:
+        return 'png';
+      case ConvertMode.webp:
+        return 'webp';
+      default:
+        return 'jpg';
+    }
+  }
+
+  Future<List<SavedFile>> onConvertToFile() async {
+    emit(state.copyWith(isConvertingImageToBytes: true));
+
+    final List<SavedFile> savedFiles = [];
+
+    while (convertingImageKeys.isNotEmpty) {}
+    final convertMode = state.convertMode;
+
+    //Check convert to image or pdf
+    final convertFile = switch (convertMode) {
+      ConvertMode.jpg ||
+      ConvertMode.png ||
+      ConvertMode.webp => ConvertFile.image,
+      ConvertMode.pdf => ConvertFile.pdf,
+    };
+
+    String storagePath = await getStoragePath(convertFile);
+
+    if (convertFile == ConvertFile.pdf) {
+      Uint8List firstImage = state.images[0].bytes;
+
+      final PdfDocument document = PdfDocument();
+      for (final imageBytes in state.images) {
+        final PdfImage image = PdfBitmap(imageBytes.bytes);
+
+        final page = document.pages.add();
+        const double imageWidth = 500;
+        const double imageHeight = 500;
+        final double pageWidth = page.getClientSize().width;
+        final double pageHeight = page.getClientSize().height;
+        final double x = (pageWidth - imageWidth) / 2;
+        final double y = (pageHeight - imageHeight) / 2;
+        page.graphics.drawImage(
+          image,
+          Rect.fromLTWH(x, y, imageWidth, imageHeight),
+        );
+      }
+
+      final List<int> bytes = await document.save();
+      document.dispose();
+
+      final downloadDir = Directory('/storage/emulated/0/Download/pdf files');
+      if (!await downloadDir.exists()) {
+        await downloadDir.create(recursive: true);
+      }
+
+      // Tạo tên file ngẫu nhiên và kiểm tra trùng
+      final randomNumber =
+          (100 + (DateTime.now().millisecondsSinceEpoch % 900));
+      String baseName = 'MyPdf_$randomNumber';
+      String fileName = baseName;
+      int count = 1;
+      while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
+        fileName = '$baseName($count)';
+        count++;
+      }
+
+      final file = File('${downloadDir.path}/$fileName.pdf');
+
+      savedFiles.add(
+        SavedFile(
+          image: firstImage,
+          name: "$fileName.pdf",
+          size: Utils.formatSize(bytes.length),
+          path: "${downloadDir.path}/$fileName.pdf",
+        ),
+      );
+      print("convert to pdf ${bytes.length}");
+      await file.writeAsBytes(bytes);
+    } else {
+      //convert to image
+
+      storagePath = path.join(
+        storagePath,
+        "${getExtensionFromConvertMode(state.convertMode)} images",
+      );
+
+      for (int i = 0; i < state.cubits.length; i++) {
+        final imageKey = buildImageKeyMap(
+          index: i,
+          convertMode: state.convertMode,
+          compressAmount: state.compressAmount,
+          isGrayScale: state.isGrayScale,
+        );
+        final image = cachedImages[imageKey];
+
+        final imageName = state.images[i].name;
+
+        if (image != null) {
+          final savedFile = await convertImageUsecase.convertToImage(
+            convertMode: convertMode,
+            image: image,
+            imageName: imageName,
+            storagePath: storagePath,
+          );
+
+          savedFiles.add(savedFile);
+        }
+      }
+    }
+
+    emit(state.copyWith(isConvertingImageToBytes: false));
+
+    return savedFiles;
   }
 }
