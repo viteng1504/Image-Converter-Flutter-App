@@ -1,6 +1,10 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+// Project imports:
 import '../../../../../core/resources/app_assets.dart';
 import 'widgets/welcome_screen.dart';
 

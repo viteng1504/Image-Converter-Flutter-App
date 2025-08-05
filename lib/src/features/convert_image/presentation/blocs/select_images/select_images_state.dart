@@ -1,7 +1,11 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Package imports:
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+// Project imports:
 import '../../../domain/entities/original_image.dart';
 
 part 'select_images_state.freezed.dart';

@@ -1,9 +1,14 @@
+// Dart imports:
 import 'dart:math';
 import 'dart:ui';
 
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// Project imports:
 import '../../../../../core/device_info.dart';
 import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';

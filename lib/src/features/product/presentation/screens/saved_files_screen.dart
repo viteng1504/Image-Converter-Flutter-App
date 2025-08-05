@@ -1,8 +1,13 @@
+// Dart imports:
 import 'dart:math' as math;
 
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:open_file/open_file.dart';
 
+// Project imports:
 import '../../../../core/resources/app_assets.dart';
 import '../../../convert_image/domain/entities/saved_file.dart';
 

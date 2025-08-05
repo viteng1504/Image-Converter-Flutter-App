@@ -1,7 +1,10 @@
+// Dart imports:
 import 'dart:typed_data';
 
+// Package imports:
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+// Project imports:
 import '../../../../core/device_info.dart';
 import '../../../../core/enums/convert.dart';
 import '../../domain/entities/original_image.dart';

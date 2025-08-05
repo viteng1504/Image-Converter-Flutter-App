@@ -1,8 +1,11 @@
+// Dart imports:
 import 'dart:math';
 import 'dart:typed_data';
 
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+// Project imports:
 import '../../../../../core/enums/convert.dart';
 import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';

@@ -1,8 +1,16 @@
+// Dart imports:
+import 'dart:typed_data';
+
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+// Project imports:
 import '../../../../../core/device_info.dart';
+import '../../../../../core/enums/convert.dart';
 import '../../../../../core/resources/app_assets.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';

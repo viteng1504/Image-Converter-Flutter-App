@@ -1,8 +1,10 @@
+// Dart imports:
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
+// Package imports:
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -10,6 +12,7 @@ import 'package:image_size_getter/image_size_getter.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:path/path.dart' as path;
 
+// Project imports:
 import '../../../../../core/device_info.dart';
 import '../../../../../core/enums/convert.dart';
 import '../../../../../core/utils/utils.dart';

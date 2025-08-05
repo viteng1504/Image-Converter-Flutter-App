@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Package imports:
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'image_display_state.freezed.dart';

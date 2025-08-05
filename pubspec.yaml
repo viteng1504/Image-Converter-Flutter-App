@@ -71,6 +71,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+  import_sorter: ^4.6.0
+
   # Gen Code
   build_runner: ^2.4.7
   freezed: ^2.4.6

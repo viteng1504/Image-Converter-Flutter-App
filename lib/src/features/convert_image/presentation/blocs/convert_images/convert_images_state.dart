@@ -1,6 +1,10 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Package imports:
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+// Project imports:
 import '../../../../../core/enums/convert.dart';
 import '../../../domain/entities/original_image.dart';
 import 'image_display_cubit.dart';

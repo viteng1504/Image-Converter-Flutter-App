@@ -1,6 +1,10 @@
+// Dart imports:
 import 'dart:io';
 
+// Flutter imports:
 import 'package:flutter/services.dart';
+
+// Package imports:
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class Convert {

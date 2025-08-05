@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Project imports:
 import 'src/core/device_info.dart';
 import 'src/core/resources/app_colors.dart';
 import 'src/features/convert_image/presentation/screens/select_images/select_images_screen.dart';

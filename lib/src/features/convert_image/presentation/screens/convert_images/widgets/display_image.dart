@@ -1,6 +1,8 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Project imports:
 import '../../../../../../core/resources/app_assets.dart';
 
 class DisplayImage extends StatefulWidget {

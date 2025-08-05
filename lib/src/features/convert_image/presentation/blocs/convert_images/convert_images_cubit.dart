@@ -1,12 +1,17 @@
+// Dart imports:
 import 'dart:io';
 
+// Flutter imports:
 import 'package:flutter/services.dart';
+
+// Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
+// Project imports:
 import '../../../../../core/enums/convert.dart';
 import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
