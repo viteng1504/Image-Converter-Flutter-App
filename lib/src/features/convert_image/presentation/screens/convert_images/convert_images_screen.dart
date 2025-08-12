@@ -95,51 +95,77 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      state.convertMode == ConvertMode.pdf
-                          ? Expanded(
-                            child: ReorderableGridView(
-                              imagesBytes: imageBytesList,
-                            ),
-                          )
-                          : Expanded(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        widget.images.length == 1 ? 1 : 2,
-                                    mainAxisSpacing: 16,
-                                    crossAxisSpacing: 16,
-                                    childAspectRatio: 0.9,
+                      if (state.isConvertingToFiles)
+                        Expanded(
+                          child: Center(
+                            child: Column(
+                              spacing: 20,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.primary,
                                   ),
-                              itemCount: widget.images.length,
-                              itemBuilder: (context, index) {
-                                return BlocProvider.value(
-                                  value: cubits[index],
-                                  key: ValueKey(
-                                    "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
+                                ),
+                                Text(
+                                  "${state.convertedImageQty}/${cubits.length} images converted",
+                                  style: const TextStyle(
+                                    color: AppColors.fontGray,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
                                   ),
-
-                                  child: BlocBuilder<
-                                    ImageDisplayCubit,
-                                    ImageDisplayState
-                                  >(
-                                    builder: (imageContext, imageState) {
-                                      return DisplayImage(
-                                        bytes: imageState.image,
-                                        size:
-                                            imageState.size ??
-                                            "Loading file size",
-                                        isLoadingImage:
-                                            imageState.isLoadingImage,
-                                        isLoadingSize: imageState.isLoadingSize,
-                                        isGrayScale: state.isGrayScale,
-                                      );
-                                    },
-                                  ),
-                                );
-                              },
+                                ),
+                              ],
                             ),
                           ),
+                        )
+                      else
+                        state.convertMode == ConvertMode.pdf
+                            ? Expanded(
+                              child: ReorderableGridView(
+                                imagesBytes: imageBytesList,
+                              ),
+                            )
+                            : Expanded(
+                              child: GridView.builder(
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount:
+                                          widget.images.length == 1 ? 1 : 2,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 0.9,
+                                    ),
+                                itemCount: widget.images.length,
+                                itemBuilder: (context, index) {
+                                  return BlocProvider.value(
+                                    value: cubits[index],
+                                    key: ValueKey(
+                                      "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
+                                    ),
+
+                                    child: BlocBuilder<
+                                      ImageDisplayCubit,
+                                      ImageDisplayState
+                                    >(
+                                      builder: (imageContext, imageState) {
+                                        return DisplayImage(
+                                          bytes: imageState.image,
+                                          size:
+                                              imageState.size ??
+                                              "Loading file size",
+                                          isLoadingImage:
+                                              imageState.isLoadingImage,
+                                          isLoadingSize:
+                                              imageState.isLoadingSize,
+                                          isGrayScale: state.isGrayScale,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
 
                       const SizedBox(height: 20),
 

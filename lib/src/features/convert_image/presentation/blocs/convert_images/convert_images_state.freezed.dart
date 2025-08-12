@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ConvertImagesState {
   bool get isConvertingImageToBytes => throw _privateConstructorUsedError;
+  bool get isConvertingToFiles => throw _privateConstructorUsedError;
   List<OriginalImage> get images => throw _privateConstructorUsedError;
   List<OriginalImage> get halfSizeImages => throw _privateConstructorUsedError;
   int get compressAmount => throw _privateConstructorUsedError;
@@ -26,6 +27,7 @@ mixin _$ConvertImagesState {
   List<ConvertImagesState> get imageStateList =>
       throw _privateConstructorUsedError;
   List<ImageDisplayCubit> get cubits => throw _privateConstructorUsedError;
+  int get convertedImageQty => throw _privateConstructorUsedError;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.
@@ -43,6 +45,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
   @useResult
   $Res call({
     bool isConvertingImageToBytes,
+    bool isConvertingToFiles,
     List<OriginalImage> images,
     List<OriginalImage> halfSizeImages,
     int compressAmount,
@@ -50,6 +53,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
     ConvertMode convertMode,
     List<ConvertImagesState> imageStateList,
     List<ImageDisplayCubit> cubits,
+    int convertedImageQty,
   });
 }
 
@@ -69,6 +73,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
   @override
   $Res call({
     Object? isConvertingImageToBytes = null,
+    Object? isConvertingToFiles = null,
     Object? images = null,
     Object? halfSizeImages = null,
     Object? compressAmount = null,
@@ -76,6 +81,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
     Object? convertMode = null,
     Object? imageStateList = null,
     Object? cubits = null,
+    Object? convertedImageQty = null,
   }) {
     return _then(
       _value.copyWith(
@@ -83,6 +89,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                 null == isConvertingImageToBytes
                     ? _value.isConvertingImageToBytes
                     : isConvertingImageToBytes // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            isConvertingToFiles:
+                null == isConvertingToFiles
+                    ? _value.isConvertingToFiles
+                    : isConvertingToFiles // ignore: cast_nullable_to_non_nullable
                         as bool,
             images:
                 null == images
@@ -119,6 +130,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.cubits
                     : cubits // ignore: cast_nullable_to_non_nullable
                         as List<ImageDisplayCubit>,
+            convertedImageQty:
+                null == convertedImageQty
+                    ? _value.convertedImageQty
+                    : convertedImageQty // ignore: cast_nullable_to_non_nullable
+                        as int,
           )
           as $Val,
     );
@@ -136,6 +152,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
   @useResult
   $Res call({
     bool isConvertingImageToBytes,
+    bool isConvertingToFiles,
     List<OriginalImage> images,
     List<OriginalImage> halfSizeImages,
     int compressAmount,
@@ -143,6 +160,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
     ConvertMode convertMode,
     List<ConvertImagesState> imageStateList,
     List<ImageDisplayCubit> cubits,
+    int convertedImageQty,
   });
 }
 
@@ -161,6 +179,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? isConvertingImageToBytes = null,
+    Object? isConvertingToFiles = null,
     Object? images = null,
     Object? halfSizeImages = null,
     Object? compressAmount = null,
@@ -168,6 +187,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
     Object? convertMode = null,
     Object? imageStateList = null,
     Object? cubits = null,
+    Object? convertedImageQty = null,
   }) {
     return _then(
       _$ConvertImagesStateImpl(
@@ -175,6 +195,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
             null == isConvertingImageToBytes
                 ? _value.isConvertingImageToBytes
                 : isConvertingImageToBytes // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        isConvertingToFiles:
+            null == isConvertingToFiles
+                ? _value.isConvertingToFiles
+                : isConvertingToFiles // ignore: cast_nullable_to_non_nullable
                     as bool,
         images:
             null == images
@@ -211,6 +236,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value._cubits
                 : cubits // ignore: cast_nullable_to_non_nullable
                     as List<ImageDisplayCubit>,
+        convertedImageQty:
+            null == convertedImageQty
+                ? _value.convertedImageQty
+                : convertedImageQty // ignore: cast_nullable_to_non_nullable
+                    as int,
       ),
     );
   }
@@ -223,6 +253,7 @@ class _$ConvertImagesStateImpl
     implements _ConvertImagesState {
   const _$ConvertImagesStateImpl({
     required this.isConvertingImageToBytes,
+    required this.isConvertingToFiles,
     required final List<OriginalImage> images,
     required final List<OriginalImage> halfSizeImages,
     required this.compressAmount,
@@ -230,6 +261,7 @@ class _$ConvertImagesStateImpl
     required this.convertMode,
     required final List<ConvertImagesState> imageStateList,
     required final List<ImageDisplayCubit> cubits,
+    required this.convertedImageQty,
   }) : _images = images,
        _halfSizeImages = halfSizeImages,
        _imageStateList = imageStateList,
@@ -237,6 +269,8 @@ class _$ConvertImagesStateImpl
 
   @override
   final bool isConvertingImageToBytes;
+  @override
+  final bool isConvertingToFiles;
   final List<OriginalImage> _images;
   @override
   List<OriginalImage> get images {
@@ -276,8 +310,11 @@ class _$ConvertImagesStateImpl
   }
 
   @override
+  final int convertedImageQty;
+
+  @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, images: $images, halfSizeImages: $halfSizeImages, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList, cubits: $cubits)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, halfSizeImages: $halfSizeImages, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList, cubits: $cubits, convertedImageQty: $convertedImageQty)';
   }
 
   @override
@@ -291,13 +328,15 @@ class _$ConvertImagesStateImpl
           isConvertingImageToBytes,
         ),
       )
+      ..add(DiagnosticsProperty('isConvertingToFiles', isConvertingToFiles))
       ..add(DiagnosticsProperty('images', images))
       ..add(DiagnosticsProperty('halfSizeImages', halfSizeImages))
       ..add(DiagnosticsProperty('compressAmount', compressAmount))
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
       ..add(DiagnosticsProperty('convertMode', convertMode))
       ..add(DiagnosticsProperty('imageStateList', imageStateList))
-      ..add(DiagnosticsProperty('cubits', cubits));
+      ..add(DiagnosticsProperty('cubits', cubits))
+      ..add(DiagnosticsProperty('convertedImageQty', convertedImageQty));
   }
 
   @override
@@ -310,6 +349,8 @@ class _$ConvertImagesStateImpl
                   isConvertingImageToBytes,
                 ) ||
                 other.isConvertingImageToBytes == isConvertingImageToBytes) &&
+            (identical(other.isConvertingToFiles, isConvertingToFiles) ||
+                other.isConvertingToFiles == isConvertingToFiles) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
             const DeepCollectionEquality().equals(
               other._halfSizeImages,
@@ -325,13 +366,16 @@ class _$ConvertImagesStateImpl
               other._imageStateList,
               _imageStateList,
             ) &&
-            const DeepCollectionEquality().equals(other._cubits, _cubits));
+            const DeepCollectionEquality().equals(other._cubits, _cubits) &&
+            (identical(other.convertedImageQty, convertedImageQty) ||
+                other.convertedImageQty == convertedImageQty));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     isConvertingImageToBytes,
+    isConvertingToFiles,
     const DeepCollectionEquality().hash(_images),
     const DeepCollectionEquality().hash(_halfSizeImages),
     compressAmount,
@@ -339,6 +383,7 @@ class _$ConvertImagesStateImpl
     convertMode,
     const DeepCollectionEquality().hash(_imageStateList),
     const DeepCollectionEquality().hash(_cubits),
+    convertedImageQty,
   );
 
   /// Create a copy of ConvertImagesState
@@ -356,6 +401,7 @@ class _$ConvertImagesStateImpl
 abstract class _ConvertImagesState implements ConvertImagesState {
   const factory _ConvertImagesState({
     required final bool isConvertingImageToBytes,
+    required final bool isConvertingToFiles,
     required final List<OriginalImage> images,
     required final List<OriginalImage> halfSizeImages,
     required final int compressAmount,
@@ -363,10 +409,13 @@ abstract class _ConvertImagesState implements ConvertImagesState {
     required final ConvertMode convertMode,
     required final List<ConvertImagesState> imageStateList,
     required final List<ImageDisplayCubit> cubits,
+    required final int convertedImageQty,
   }) = _$ConvertImagesStateImpl;
 
   @override
   bool get isConvertingImageToBytes;
+  @override
+  bool get isConvertingToFiles;
   @override
   List<OriginalImage> get images;
   @override
@@ -381,6 +430,8 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   List<ConvertImagesState> get imageStateList;
   @override
   List<ImageDisplayCubit> get cubits;
+  @override
+  int get convertedImageQty;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.

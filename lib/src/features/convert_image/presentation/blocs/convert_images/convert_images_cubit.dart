@@ -233,12 +233,19 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       final PdfImage image = PdfBitmap(imageBytes!);
 
       final page = document.pages.add();
-      const double imageWidth = 500;
-      const double imageHeight = 500;
-      final double pageWidth = page.getClientSize().width;
-      final double pageHeight = page.getClientSize().height;
-      final double x = (pageWidth - imageWidth) / 2;
-      final double y = (pageHeight - imageHeight) / 2;
+      final originalWidth = image.width;
+      final originalHeight = image.height;
+
+      final double widthRatio = page.getClientSize().width / originalWidth;
+      final double heightRatio = page.getClientSize().height / originalHeight;
+      final double scale = widthRatio < heightRatio ? widthRatio : heightRatio;
+
+      final double imageWidth = originalWidth * scale;
+      final double imageHeight = originalHeight * scale;
+
+      final double x = (page.getClientSize().width - imageWidth) / 2;
+      final double y = (page.getClientSize().height - imageHeight) / 2;
+
       page.graphics.drawImage(
         image,
         Rect.fromLTWH(x, y, imageWidth, imageHeight),
@@ -277,7 +284,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   Future<void> onConvertToFile(BuildContext context) async {
-    emit(state.copyWith(isConvertingImageToBytes: true));
+    emit(state.copyWith(isConvertingToFiles: true));
 
     final List<SavedFile> savedFiles = [];
 
@@ -329,16 +336,18 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
             imageName: imageName,
             storagePath: storagePath,
           );
+          emit(state.copyWith(convertedImageQty: state.convertedImageQty + 1));
 
           savedFiles.add(savedFile);
         }
       }
     }
 
-    emit(state.copyWith(isConvertingImageToBytes: false));
+    emit(state.copyWith(isConvertingToFiles: false));
 
     if (state.isConvertingImageToBytes == false &&
         convertingImageKeys.isEmpty) {
+      emit(state.copyWith(convertedImageQty: 0));
       await Navigator.pushNamed(
         context,
         "/saved_files",

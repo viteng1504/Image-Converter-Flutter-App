@@ -1,6 +1,5 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
-
 // Package imports:
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -15,6 +14,7 @@ part 'convert_images_state.freezed.dart';
 class ConvertImagesState with _$ConvertImagesState {
   const factory ConvertImagesState({
     required bool isConvertingImageToBytes,
+    required bool isConvertingToFiles,
     required List<OriginalImage> images,
     required List<OriginalImage> halfSizeImages,
     required int compressAmount,
@@ -22,6 +22,7 @@ class ConvertImagesState with _$ConvertImagesState {
     required ConvertMode convertMode,
     required List<ConvertImagesState> imageStateList,
     required List<ImageDisplayCubit> cubits,
+    required int convertedImageQty,
   }) = _ConvertImagesState;
 
   factory ConvertImagesState.initial() => const ConvertImagesState(
@@ -33,5 +34,7 @@ class ConvertImagesState with _$ConvertImagesState {
     imageStateList: [],
     halfSizeImages: [],
     cubits: [],
+    isConvertingToFiles: false,
+    convertedImageQty: 0,
   );
 }
