@@ -148,8 +148,8 @@ class ConvertApi {
     print("extension Name $extensionName");
     final baseFileName = path.basenameWithoutExtension(fileName);
 
-    String newPath = path.join(storagePath, fileName);
-    String imageName = fileName;
+    String imageName = "$baseFileName$extensionName";
+    String newPath = path.join(storagePath, imageName);
     int index = 1;
     while (await File(newPath).exists()) {
       imageName = "$baseFileName ($index)$extensionName";
