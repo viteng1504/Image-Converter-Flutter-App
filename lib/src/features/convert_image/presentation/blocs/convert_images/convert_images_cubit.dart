@@ -317,6 +317,12 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         "${getExtensionFromConvertMode(state.convertMode)} images",
       );
 
+      // create store images path
+      final dir = Directory(storagePath);
+      if (!await dir.exists()) {
+        await dir.create(recursive: true);
+      }
+
       for (int i = 0; i < state.cubits.length; i++) {
         final imageKey = buildImageKeyMap(
           index: i,
