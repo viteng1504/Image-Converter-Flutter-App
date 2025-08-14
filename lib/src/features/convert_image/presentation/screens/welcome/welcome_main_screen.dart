@@ -1,6 +1,5 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -27,7 +26,7 @@ class _WelcomeMainScreenState extends State<WelcomeMainScreen> {
     ),
     const WelcomeScreen(
       image: AppIcons.convert,
-      headerText: "Convert to JPG, PNG, WEBP, PDF",
+      headerText: "Convert to JPG PNG WEBP PDF",
       bodyText: "One or multiple images at the same time.",
     ),
     const WelcomeScreen(
@@ -74,71 +73,76 @@ class _WelcomeMainScreenState extends State<WelcomeMainScreen> {
   Widget build(BuildContext context) {
     final bool isLastPage = _currentPageIndex == pages.length - 1;
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
-        child: Column(
-          children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                onPageChanged: _onPageChanged,
-                itemCount: pages.length,
-                itemBuilder: (context, index) {
-                  return pages[index];
-                },
-              ),
-            ),
-
-            SmoothPageIndicator(
-              controller: _controller,
-              count: 4,
-              effect: const ScrollingDotsEffect(
-                dotHeight: 13,
-                dotWidth: 13,
-                activeDotColor: AppColors.indicatorDotActive,
-                dotColor: AppColors.indicatorDot,
-              ),
-            ),
-            const SizedBox(height: 60),
-            Row(
-              mainAxisAlignment:
-                  isLastPage
-                      ? MainAxisAlignment.end
-                      : MainAxisAlignment.spaceBetween,
-
-              children: [
-                if (!isLastPage)
-                  TextButton(
-                    onPressed: _toLastPage,
-                    child: const Text(
-                      "Skip",
-                      style: TextStyle(fontSize: 16, color: AppColors.primary),
-                    ),
-                  ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 14,
-                    ),
-                  ),
-                  onPressed: _onNextPage,
-                  child: Row(
-                    children: [
-                      const Text(
-                        "Continue",
-                        style: TextStyle(fontSize: 16, color: AppColors.font),
-                      ),
-                      const SizedBox(width: 16),
-                      Image.asset(AppIcons.rightArrow, width: 20, height: 20),
-                    ],
-                  ),
+    return SafeArea(
+      child: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
+          child: Column(
+            children: [
+              Expanded(
+                child: PageView.builder(
+                  controller: _controller,
+                  onPageChanged: _onPageChanged,
+                  itemCount: pages.length,
+                  itemBuilder: (context, index) {
+                    return pages[index];
+                  },
                 ),
-              ],
-            ),
-          ],
+              ),
+
+              SmoothPageIndicator(
+                controller: _controller,
+                count: 4,
+                effect: const ScrollingDotsEffect(
+                  dotHeight: 13,
+                  dotWidth: 13,
+                  activeDotColor: AppColors.indicatorDotActive,
+                  dotColor: AppColors.indicatorDot,
+                ),
+              ),
+              const SizedBox(height: 40),
+              Row(
+                mainAxisAlignment:
+                    isLastPage
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.spaceBetween,
+
+                children: [
+                  if (!isLastPage)
+                    TextButton(
+                      onPressed: _toLastPage,
+                      child: const Text(
+                        "Skip",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 14,
+                      ),
+                    ),
+                    onPressed: _onNextPage,
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Continue",
+                          style: TextStyle(fontSize: 16, color: AppColors.font),
+                        ),
+                        const SizedBox(width: 16),
+                        Image.asset(AppIcons.rightArrow, width: 20, height: 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

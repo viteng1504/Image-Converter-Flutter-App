@@ -4,6 +4,8 @@ import 'dart:typed_data';
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+import '../../../../../../core/resources/app_colors.dart';
+
 class ReorderableGridView extends StatefulWidget {
   final List<Uint8List?> imagesBytes;
   const ReorderableGridView({super.key, required this.imagesBytes});
@@ -78,7 +80,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
                 left: left,
                 width: itemWidth,
                 height: itemHeight,
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 100),
                 child: DragTarget<int>(
                   onWillAccept: (from) {
                     if (from == null || from == itemIndex) return false;
@@ -211,7 +213,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black,
+        color: AppColors.sliderInactiveTrack,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Stack(
@@ -229,7 +231,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
                           ? Image.memory(
                             imageBytes,
                             fit: BoxFit.cover,
-                            height: 150,
+                            height: 130,
                             width: double.infinity,
                           )
                           : Container(
@@ -241,7 +243,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, ),
                     child: Row(
                       children: [
                         Column(
