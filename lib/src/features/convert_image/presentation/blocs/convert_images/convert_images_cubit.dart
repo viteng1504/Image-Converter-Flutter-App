@@ -223,7 +223,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   // convert to pdf
-  Future<SavedFile> convertToPdf() async {
+  Future<SavedFile> convertToPdf(String basePdfName) async {
     Uint8List firstImage = state.cubits[0].state.image!;
 
     final PdfDocument document = PdfDocument();
@@ -261,12 +261,11 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     }
 
     // Tạo tên file ngẫu nhiên và kiểm tra trùng
-    final randomNumber = (100 + (DateTime.now().millisecondsSinceEpoch % 900));
-    String baseName = 'MyPdf_$randomNumber';
-    String fileName = baseName;
+
+    String fileName = basePdfName;
     int count = 1;
     while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
-      fileName = '$baseName($count)';
+      fileName = '$basePdfName($count)';
       count++;
     }
 
@@ -283,7 +282,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     );
   }
 
-  Future<void> onConvertToFile(BuildContext context) async {
+  Future<void> onConvertToFile(BuildContext context, String basePdfName) async {
     emit(state.copyWith(isConvertingToFiles: true));
 
     final List<SavedFile> savedFiles = [];
@@ -307,7 +306,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     String storagePath = await getStoragePath(convertFile);
 
     if (convertFile == ConvertFile.pdf) {
-      final pdfSavedFile = await convertToPdf();
+      final pdfSavedFile = await convertToPdf(basePdfName);
       savedFiles.add(pdfSavedFile);
     } else {
       //convert to image

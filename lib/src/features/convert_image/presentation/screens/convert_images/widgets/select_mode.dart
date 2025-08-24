@@ -2,19 +2,26 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
+import '../../../../../../core/enums/convert.dart';
 import '../../../../../../core/resources/app_assets.dart';
 
 enum Mode { compress, other }
 
 class SelectMode extends StatefulWidget {
   final Function(double) onChangedEnd;
-  final Function(bool?) onChecked;
+  final Function(String) onChangedTextField;
+  final VoidCallback onChecked;
   final bool isGrayScaleChecked;
+  final ConvertMode convertMode;
+  final TextEditingController controller;
   const SelectMode({
     super.key,
+    required this.onChangedTextField,
     required this.isGrayScaleChecked,
     required this.onChangedEnd,
     required this.onChecked,
+    required this.convertMode,
+    required this.controller,
   });
 
   @override
@@ -28,11 +35,10 @@ class _SelectModeState extends State<SelectMode> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200,
+      height: 190,
       child: Column(
         children: [
           if (_modeSelected == Mode.compress) _compressTab() else _otherTab(),
-          const SizedBox(),
           // const SizedBox(height: 32),
           const Divider(thickness: 0.2),
 
@@ -52,7 +58,7 @@ class _SelectModeState extends State<SelectMode> {
 
   Widget _compressTab() {
     return SizedBox(
-      height: 100,
+      height: 110,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -118,62 +124,112 @@ class _SelectModeState extends State<SelectMode> {
 
   Widget _otherTab() {
     return SizedBox(
-      height: 100,
+      height: 110,
       child: Column(
         children: [
-          const Row(
-            spacing: 20,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(13),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.fontGray,
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
+          widget.convertMode != ConvertMode.pdf
+              ? InkWell(
+                onTap: () {},
+                child: const Row(
+                  spacing: 20,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(13),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: AppColors.fontGray,
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                        child: SizedBox(width: 23, height: 23),
+                      ),
+                    ),
+                    Text(
+                      "Fill transparency color",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                        color: AppColors.fontGray,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: TextField(
+                  controller: widget.controller,
+                  scrollPadding: const EdgeInsets.only(bottom: 300),
+                  cursorColor: AppColors.primary,
+
+                  onChanged: widget.onChangedTextField,
+
+                  style: const TextStyle(color: AppColors.fontGray),
+
+                  decoration: const InputDecoration(
+                    filled: true,
+                    labelText: "File name",
+                    labelStyle: TextStyle(color: AppColors.fontGray),
+                    floatingLabelStyle: TextStyle(
+                      color: AppColors.fontGray,
+                      fontWeight: FontWeight.w500,
+                    ),
+
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: AppColors.fontGray),
+                    ),
+
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    focusColor: AppColors.white,
+                    fillColor: AppColors.sliderInactiveTrack,
                   ),
-                  child: SizedBox(width: 23, height: 23),
                 ),
               ),
-              Text(
-                "Fill transparency color",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: AppColors.fontGray,
+          InkWell(
+            onTap: () {
+              widget.onChecked();
+            },
+            child: Row(
+              spacing: 20,
+              children: [
+                Checkbox(
+                  side: const BorderSide(color: AppColors.fontGray, width: 2),
+                  checkColor: AppColors.white,
+                  fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return AppColors.primary;
+                    }
+                    return Colors.transparent;
+                  }),
+                  value: widget.isGrayScaleChecked,
+                  onChanged: (_) {
+                    widget.onChecked();
+                  },
                 ),
-              ),
-            ],
-          ),
-          Row(
-            spacing: 20,
-            children: [
-              Checkbox(
-                side: const BorderSide(color: AppColors.fontGray, width: 2),
-                checkColor: AppColors.white,
-                fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-                  if (states.contains(WidgetState.selected)) {
-                    return AppColors.primary;
-                  }
-                  return Colors.transparent;
-                }),
-                value: widget.isGrayScaleChecked,
-                onChanged: widget.onChecked,
-              ),
-              const Text(
-                "Gray scale (black and white)",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: AppColors.fontGray,
+
+                const Text(
+                  "Gray scale (black and white)",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: AppColors.fontGray,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
     );
   }
 
+  //button widget
   Widget _modeButton(Mode mode, String label) {
     final bool isSelected = _modeSelected == mode;
     return Expanded(

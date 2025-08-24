@@ -16,25 +16,23 @@ class ConvertImagesState with _$ConvertImagesState {
     required bool isConvertingImageToBytes,
     required bool isConvertingToFiles,
     required List<OriginalImage> images,
-    required List<OriginalImage> halfSizeImages,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
-    required List<ConvertImagesState> imageStateList,
     required List<ImageDisplayCubit> cubits,
     required int convertedImageQty,
   }) = _ConvertImagesState;
 
-  factory ConvertImagesState.initial() => const ConvertImagesState(
-    isConvertingImageToBytes: false,
-    images: [],
-    compressAmount: 0,
-    isGrayScale: false,
-    convertMode: ConvertMode.jpg,
-    imageStateList: [],
-    halfSizeImages: [],
-    cubits: [],
-    isConvertingToFiles: false,
-    convertedImageQty: 0,
-  );
+  factory ConvertImagesState.initial() {
+    return const ConvertImagesState(
+      isConvertingImageToBytes: false,
+      images: [],
+      compressAmount: 0,
+      isGrayScale: false,
+      convertMode: ConvertMode.jpg,
+      cubits: [],
+      isConvertingToFiles: false,
+      convertedImageQty: 0,
+    );
+  }
 }

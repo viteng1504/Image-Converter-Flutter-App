@@ -20,12 +20,9 @@ mixin _$ConvertImagesState {
   bool get isConvertingImageToBytes => throw _privateConstructorUsedError;
   bool get isConvertingToFiles => throw _privateConstructorUsedError;
   List<OriginalImage> get images => throw _privateConstructorUsedError;
-  List<OriginalImage> get halfSizeImages => throw _privateConstructorUsedError;
   int get compressAmount => throw _privateConstructorUsedError;
   bool get isGrayScale => throw _privateConstructorUsedError;
   ConvertMode get convertMode => throw _privateConstructorUsedError;
-  List<ConvertImagesState> get imageStateList =>
-      throw _privateConstructorUsedError;
   List<ImageDisplayCubit> get cubits => throw _privateConstructorUsedError;
   int get convertedImageQty => throw _privateConstructorUsedError;
 
@@ -47,11 +44,9 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
     bool isConvertingImageToBytes,
     bool isConvertingToFiles,
     List<OriginalImage> images,
-    List<OriginalImage> halfSizeImages,
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
-    List<ConvertImagesState> imageStateList,
     List<ImageDisplayCubit> cubits,
     int convertedImageQty,
   });
@@ -75,11 +70,9 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
     Object? isConvertingImageToBytes = null,
     Object? isConvertingToFiles = null,
     Object? images = null,
-    Object? halfSizeImages = null,
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
-    Object? imageStateList = null,
     Object? cubits = null,
     Object? convertedImageQty = null,
   }) {
@@ -100,11 +93,6 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.images
                     : images // ignore: cast_nullable_to_non_nullable
                         as List<OriginalImage>,
-            halfSizeImages:
-                null == halfSizeImages
-                    ? _value.halfSizeImages
-                    : halfSizeImages // ignore: cast_nullable_to_non_nullable
-                        as List<OriginalImage>,
             compressAmount:
                 null == compressAmount
                     ? _value.compressAmount
@@ -120,11 +108,6 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.convertMode
                     : convertMode // ignore: cast_nullable_to_non_nullable
                         as ConvertMode,
-            imageStateList:
-                null == imageStateList
-                    ? _value.imageStateList
-                    : imageStateList // ignore: cast_nullable_to_non_nullable
-                        as List<ConvertImagesState>,
             cubits:
                 null == cubits
                     ? _value.cubits
@@ -154,11 +137,9 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
     bool isConvertingImageToBytes,
     bool isConvertingToFiles,
     List<OriginalImage> images,
-    List<OriginalImage> halfSizeImages,
     int compressAmount,
     bool isGrayScale,
     ConvertMode convertMode,
-    List<ConvertImagesState> imageStateList,
     List<ImageDisplayCubit> cubits,
     int convertedImageQty,
   });
@@ -181,11 +162,9 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
     Object? isConvertingImageToBytes = null,
     Object? isConvertingToFiles = null,
     Object? images = null,
-    Object? halfSizeImages = null,
     Object? compressAmount = null,
     Object? isGrayScale = null,
     Object? convertMode = null,
-    Object? imageStateList = null,
     Object? cubits = null,
     Object? convertedImageQty = null,
   }) {
@@ -206,11 +185,6 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value._images
                 : images // ignore: cast_nullable_to_non_nullable
                     as List<OriginalImage>,
-        halfSizeImages:
-            null == halfSizeImages
-                ? _value._halfSizeImages
-                : halfSizeImages // ignore: cast_nullable_to_non_nullable
-                    as List<OriginalImage>,
         compressAmount:
             null == compressAmount
                 ? _value.compressAmount
@@ -226,11 +200,6 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value.convertMode
                 : convertMode // ignore: cast_nullable_to_non_nullable
                     as ConvertMode,
-        imageStateList:
-            null == imageStateList
-                ? _value._imageStateList
-                : imageStateList // ignore: cast_nullable_to_non_nullable
-                    as List<ConvertImagesState>,
         cubits:
             null == cubits
                 ? _value._cubits
@@ -255,16 +224,12 @@ class _$ConvertImagesStateImpl
     required this.isConvertingImageToBytes,
     required this.isConvertingToFiles,
     required final List<OriginalImage> images,
-    required final List<OriginalImage> halfSizeImages,
     required this.compressAmount,
     required this.isGrayScale,
     required this.convertMode,
-    required final List<ConvertImagesState> imageStateList,
     required final List<ImageDisplayCubit> cubits,
     required this.convertedImageQty,
   }) : _images = images,
-       _halfSizeImages = halfSizeImages,
-       _imageStateList = imageStateList,
        _cubits = cubits;
 
   @override
@@ -279,28 +244,12 @@ class _$ConvertImagesStateImpl
     return EqualUnmodifiableListView(_images);
   }
 
-  final List<OriginalImage> _halfSizeImages;
-  @override
-  List<OriginalImage> get halfSizeImages {
-    if (_halfSizeImages is EqualUnmodifiableListView) return _halfSizeImages;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_halfSizeImages);
-  }
-
   @override
   final int compressAmount;
   @override
   final bool isGrayScale;
   @override
   final ConvertMode convertMode;
-  final List<ConvertImagesState> _imageStateList;
-  @override
-  List<ConvertImagesState> get imageStateList {
-    if (_imageStateList is EqualUnmodifiableListView) return _imageStateList;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableListView(_imageStateList);
-  }
-
   final List<ImageDisplayCubit> _cubits;
   @override
   List<ImageDisplayCubit> get cubits {
@@ -314,7 +263,7 @@ class _$ConvertImagesStateImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, halfSizeImages: $halfSizeImages, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, imageStateList: $imageStateList, cubits: $cubits, convertedImageQty: $convertedImageQty)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, cubits: $cubits, convertedImageQty: $convertedImageQty)';
   }
 
   @override
@@ -330,11 +279,9 @@ class _$ConvertImagesStateImpl
       )
       ..add(DiagnosticsProperty('isConvertingToFiles', isConvertingToFiles))
       ..add(DiagnosticsProperty('images', images))
-      ..add(DiagnosticsProperty('halfSizeImages', halfSizeImages))
       ..add(DiagnosticsProperty('compressAmount', compressAmount))
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
       ..add(DiagnosticsProperty('convertMode', convertMode))
-      ..add(DiagnosticsProperty('imageStateList', imageStateList))
       ..add(DiagnosticsProperty('cubits', cubits))
       ..add(DiagnosticsProperty('convertedImageQty', convertedImageQty));
   }
@@ -352,20 +299,12 @@ class _$ConvertImagesStateImpl
             (identical(other.isConvertingToFiles, isConvertingToFiles) ||
                 other.isConvertingToFiles == isConvertingToFiles) &&
             const DeepCollectionEquality().equals(other._images, _images) &&
-            const DeepCollectionEquality().equals(
-              other._halfSizeImages,
-              _halfSizeImages,
-            ) &&
             (identical(other.compressAmount, compressAmount) ||
                 other.compressAmount == compressAmount) &&
             (identical(other.isGrayScale, isGrayScale) ||
                 other.isGrayScale == isGrayScale) &&
             (identical(other.convertMode, convertMode) ||
                 other.convertMode == convertMode) &&
-            const DeepCollectionEquality().equals(
-              other._imageStateList,
-              _imageStateList,
-            ) &&
             const DeepCollectionEquality().equals(other._cubits, _cubits) &&
             (identical(other.convertedImageQty, convertedImageQty) ||
                 other.convertedImageQty == convertedImageQty));
@@ -377,11 +316,9 @@ class _$ConvertImagesStateImpl
     isConvertingImageToBytes,
     isConvertingToFiles,
     const DeepCollectionEquality().hash(_images),
-    const DeepCollectionEquality().hash(_halfSizeImages),
     compressAmount,
     isGrayScale,
     convertMode,
-    const DeepCollectionEquality().hash(_imageStateList),
     const DeepCollectionEquality().hash(_cubits),
     convertedImageQty,
   );
@@ -403,11 +340,9 @@ abstract class _ConvertImagesState implements ConvertImagesState {
     required final bool isConvertingImageToBytes,
     required final bool isConvertingToFiles,
     required final List<OriginalImage> images,
-    required final List<OriginalImage> halfSizeImages,
     required final int compressAmount,
     required final bool isGrayScale,
     required final ConvertMode convertMode,
-    required final List<ConvertImagesState> imageStateList,
     required final List<ImageDisplayCubit> cubits,
     required final int convertedImageQty,
   }) = _$ConvertImagesStateImpl;
@@ -419,15 +354,11 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   @override
   List<OriginalImage> get images;
   @override
-  List<OriginalImage> get halfSizeImages;
-  @override
   int get compressAmount;
   @override
   bool get isGrayScale;
   @override
   ConvertMode get convertMode;
-  @override
-  List<ConvertImagesState> get imageStateList;
   @override
   List<ImageDisplayCubit> get cubits;
   @override
