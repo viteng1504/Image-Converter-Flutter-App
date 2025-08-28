@@ -1,4 +1,5 @@
 // Dart imports:
+import 'dart:io';
 import 'dart:math' as math;
 
 // Flutter imports:
@@ -6,6 +7,8 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
 import '../../../../core/resources/app_assets.dart';
@@ -81,9 +84,9 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                 ),
                 const SizedBox(width: 16),
                 //title-result
-                const Text(
-                  "1 File Saved, 0 Skipped",
-                  style: TextStyle(
+                Text(
+                  "${savedFiles.length} File Saved, 0 Skipped",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -100,7 +103,12 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () async {
+                final url = Uri.parse(
+                  'https://play.google.com/store/apps/details?id=com.psoffritti.compress.video',
+                );
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -253,14 +261,86 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                     color: Colors.white,
                                   ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final params = ShareParams(
+                                    files: [XFile(savedFile.path)],
+                                  );
+                                  await SharePlus.instance.share(params);
+                                },
                               ),
                               IconButton(
                                 icon: const Icon(
                                   Icons.delete,
                                   color: Colors.white,
                                 ),
-                                onPressed: () {},
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        backgroundColor: const Color.fromARGB(
+                                          255,
+                                          28,
+                                          26,
+                                          26,
+                                        ),
+                                        title: const Column(
+                                          children: [
+                                            Icon(
+                                              Icons.delete,
+                                              color: AppColors.primary,
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: const Text(
+                                          'Are you sure you want to delete this file?',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text(
+                                              'Hủy',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              final file = File(savedFile.path);
+                                              if (await file.exists()) {
+                                                await file.delete();
+                                              }
+
+                                              setState(() {
+                                                savedFiles.removeAt(index);
+                                              });
+                                            },
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -290,7 +370,152 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                     borderRadius: BorderRadius.circular(20),
                     splashColor: Colors.blue.withOpacity(0.2),
                     highlightColor: Colors.blue.withOpacity(0.2),
-                    onTap: () {},
+                    onTap: () async {
+                      if (index == 0) {
+                      } else if (index == 1) {
+                        final paragrams = ShareParams(
+                          files: savedFiles.map((e) => XFile(e.path)).toList(),
+                        );
+                        await SharePlus.instance.share(paragrams);
+                      } else if (index == 2) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                28,
+                                26,
+                                26,
+                              ),
+                              title: const Column(
+                                children: [
+                                  Icon(Icons.delete, color: AppColors.primary),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Delete All',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: const Text(
+                                'Are you sure you want to delete all these files?',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'Hủy',
+                                    style: TextStyle(color: AppColors.primary),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    for (var file in savedFiles) {
+                                      final f = File(file.path);
+                                      if (await f.exists()) {
+                                        await f.delete();
+                                      }
+                                    }
+                                    setState(() {
+                                      savedFiles.clear();
+                                    });
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: AppColors.primary),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (index == 3) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Rate this app',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      textAlign: TextAlign.center,
+                                      'You like this app? Then take a little bit of your time to leave a rating',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: List.generate(
+                                        5,
+                                        (index) => GestureDetector(
+                                          onTap: () async {
+                                            if (index == 4) {
+                                              final url = Uri.parse(
+                                                'https://play.google.com/store/apps/details?id=com.psoffritti.convertimage',
+                                              );
+                                              await launchUrl(
+                                                url,
+                                                mode:
+                                                    LaunchMode
+                                                        .externalApplication,
+                                              );
+                                            } else {
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                          child: const Icon(
+                                            Icons.star_border,
+                                            size: 40,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.transparent,
