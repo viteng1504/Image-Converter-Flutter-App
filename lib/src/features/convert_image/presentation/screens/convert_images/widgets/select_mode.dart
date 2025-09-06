@@ -35,7 +35,7 @@ class _SelectModeState extends State<SelectMode> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 190,
+      height: 200,
       child: Column(
         children: [
           if (_modeSelected == Mode.compress) _compressTab() else _otherTab(),
@@ -58,7 +58,7 @@ class _SelectModeState extends State<SelectMode> {
 
   Widget _compressTab() {
     return SizedBox(
-      height: 110,
+      height: 115,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -124,12 +124,14 @@ class _SelectModeState extends State<SelectMode> {
 
   Widget _otherTab() {
     return SizedBox(
-      height: 110,
+      height: 115,
       child: Column(
         children: [
           widget.convertMode != ConvertMode.pdf
               ? InkWell(
-                onTap: () {},
+                onTap: () {
+                  // showModalBottomSheet(context: context, ;
+                },
                 child: const Row(
                   spacing: 20,
                   children: [

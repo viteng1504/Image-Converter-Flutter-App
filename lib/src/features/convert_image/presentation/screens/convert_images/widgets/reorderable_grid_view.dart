@@ -221,27 +221,31 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
           Positioned.fill(
             child: Column(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16),
+                Expanded(
+                  flex: 4,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    child:
+                        imageBytes != null
+                            ? Image.memory(
+                              imageBytes,
+                              fit: BoxFit.cover,
+                              height: 130,
+                              width: double.infinity,
+                            )
+                            : Container(
+                              height: 150,
+                              width: double.infinity,
+                              color: Colors.grey,
+                              child: const Center(child: Text('Loading...')),
+                            ),
                   ),
-                  child:
-                      imageBytes != null
-                          ? Image.memory(
-                            imageBytes,
-                            fit: BoxFit.cover,
-                            height: 130,
-                            width: double.infinity,
-                          )
-                          : Container(
-                            height: 150,
-                            width: double.infinity,
-                            color: Colors.grey,
-                            child: const Center(child: Text('Loading...')),
-                          ),
                 ),
                 Expanded(
+                  flex:1,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20, ),
                     child: Row(
