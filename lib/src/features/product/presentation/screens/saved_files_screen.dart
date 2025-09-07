@@ -311,7 +311,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                               Navigator.of(context).pop();
                                             },
                                             child: const Text(
-                                              'Hủy',
+                                              'Cancel',
                                               style: TextStyle(
                                                 color: AppColors.primary,
                                               ),
@@ -412,7 +412,7 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                     Navigator.of(context).pop();
                                   },
                                   child: const Text(
-                                    'Hủy',
+                                    'Cancel',
                                     style: TextStyle(color: AppColors.primary),
                                   ),
                                 ),

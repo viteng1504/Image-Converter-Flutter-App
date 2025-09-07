@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 // Package imports:
+import 'package:flutter/widgets.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 // Project imports:
@@ -17,6 +18,7 @@ abstract class ImagesRepository {
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
+    required Color? filledColor,
   });
   Future<SavedFile> convertToImage({
     required ConvertMode convertMode,

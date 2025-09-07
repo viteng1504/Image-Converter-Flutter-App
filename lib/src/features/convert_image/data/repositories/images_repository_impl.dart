@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 
 // Package imports:
+import 'package:flutter/widgets.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 // Project imports:
@@ -34,12 +35,14 @@ class ImagesRepositoryImpl implements ImagesRepository {
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
+    required Color? filledColor,
   }) async {
     return await api.convertImageIsolate(
       originalImage: originalImage,
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
+      filledColor: filledColor,
     );
   }
 

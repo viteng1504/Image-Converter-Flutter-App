@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 // Package imports:
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Project imports:
@@ -40,6 +41,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
+    required Color? filledColor,
   }) async {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
 
@@ -48,6 +50,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
+      filledColor: filledColor
     );
 
     print(
@@ -82,6 +85,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
     required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
+    required Color? filledColor,
     required ConvertMode convertMode,
   }) async {
     emit(state.copyWith(isLoadingImage: true, isLoadingSize: true));
@@ -91,6 +95,7 @@ class ImageDisplayCubit extends Cubit<ImageDisplayState> {
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
+      filledColor: filledColor
     );
 
     emit(

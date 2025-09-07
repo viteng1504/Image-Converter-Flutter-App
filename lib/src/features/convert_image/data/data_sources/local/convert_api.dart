@@ -5,6 +5,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 // Package imports:
+import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image/image.dart' as img;
 import 'package:image_picker/image_picker.dart';
@@ -68,6 +69,7 @@ class ConvertApi {
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
+    required Color? filledColor,
   }) async {
     Uint8List compressed;
     Uint8List bytes = originalImage.bytes;
@@ -93,9 +95,14 @@ class ConvertApi {
       _ => CompressFormat.jpeg,
     };
 
-    if (isGrayScale) {
+    if (isGrayScale || filledColor != null) {
       bytes = await DeviceInfo.pool.withResource(() async {
-        return await grayscaleWorker(bytes, convertMode);
+        return await isolateWorker(
+          bytes,
+          convertMode,
+          isGrayScale,
+          filledColor,
+        );
       });
     } else {
       bytes = originalImage.bytes;
@@ -119,22 +126,76 @@ class ConvertApi {
     return compressed;
   }
 
-  Future<Uint8List> grayscaleWorker(Uint8List bytes, ConvertMode convertMode) {
+  Future<Uint8List> isolateWorker(
+    Uint8List bytes,
+    ConvertMode convertMode,
+    bool isGrayScale,
+    Color? filledColor,
+  ) {
     return Isolate.run(() {
-      print(
-        "________________________________________________________________________________________________________________________grayIam",
-      );
       final decoded = img.decodeImage(bytes);
       if (decoded == null) return bytes;
 
-      final grayImage = img.grayscale(decoded);
+      img.Image result = decoded;
 
-      return switch (convertMode) {
-        ConvertMode.jpg => Uint8List.fromList(img.encodeJpg(grayImage)),
-        ConvertMode.png => Uint8List.fromList(img.encodePng(grayImage)),
-        ConvertMode.webp => Uint8List.fromList(img.encodePng(grayImage)),
-        _ => Uint8List.fromList(img.encodeJpg(grayImage)),
-      };
+      if (filledColor != null) {
+        final bgR = filledColor.red; // int 0..255
+        final bgG = filledColor.green; // int 0..255
+        final bgB = filledColor.blue; // int 0..255
+        final bgA = filledColor.alpha; // int 0..255
+
+        final out = img.Image(width: result.width, height: result.height);
+
+        for (int y = 0; y < result.height; y++) {
+          for (int x = 0; x < result.width; x++) {
+            final s = result.getPixel(x, y); // src pixel
+            final sr = s.r, sg = s.g, sb = s.b, sa = s.a;
+
+            if (sa == 0) {
+              out.setPixelRgba(x, y, bgR, bgG, bgB, bgA);
+              continue;
+            }
+
+            if (bgA == 0) {
+              out.setPixelRgba(x, y, sr, sg, sb, sa);
+              continue;
+            }
+
+            final as = sa / 255.0;
+            final ab = bgA / 255.0;
+
+            final aOut = as + ab * (1.0 - as);
+            if (aOut == 0) {
+              out.setPixelRgba(x, y, 0, 0, 0, 0);
+              continue;
+            }
+
+            final rOut = ((sr * as + bgR * ab * (1.0 - as)) / aOut).round();
+            final gOut = ((sg * as + bgG * ab * (1.0 - as)) / aOut).round();
+            final bOut = ((sb * as + bgB * ab * (1.0 - as)) / aOut).round();
+            final aOutInt = (aOut * 255).round().clamp(0, 255);
+
+            out.setPixelRgba(x, y, rOut, gOut, bOut, aOutInt);
+          }
+        }
+
+        result = out;
+      }
+
+      if (isGrayScale) {
+        result = img.grayscale(result);
+      }
+
+      switch (convertMode) {
+        case ConvertMode.jpg:
+          return Uint8List.fromList(img.encodeJpg(result, quality: 95));
+        case ConvertMode.png:
+          return Uint8List.fromList(img.encodePng(result));
+        case ConvertMode.webp:
+          return Uint8List.fromList(img.encodePng(result));
+        default:
+          return Uint8List.fromList(img.encodeJpg(result, quality: 95));
+      }
     });
   }
 

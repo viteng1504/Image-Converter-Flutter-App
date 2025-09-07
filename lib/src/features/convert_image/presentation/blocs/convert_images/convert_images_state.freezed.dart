@@ -25,6 +25,7 @@ mixin _$ConvertImagesState {
   ConvertMode get convertMode => throw _privateConstructorUsedError;
   List<ImageDisplayCubit> get cubits => throw _privateConstructorUsedError;
   int get convertedImageQty => throw _privateConstructorUsedError;
+  Color? get filledColor => throw _privateConstructorUsedError;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.
@@ -49,6 +50,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
     ConvertMode convertMode,
     List<ImageDisplayCubit> cubits,
     int convertedImageQty,
+    Color? filledColor,
   });
 }
 
@@ -75,6 +77,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
     Object? convertMode = null,
     Object? cubits = null,
     Object? convertedImageQty = null,
+    Object? filledColor = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +121,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.convertedImageQty
                     : convertedImageQty // ignore: cast_nullable_to_non_nullable
                         as int,
+            filledColor:
+                freezed == filledColor
+                    ? _value.filledColor
+                    : filledColor // ignore: cast_nullable_to_non_nullable
+                        as Color?,
           )
           as $Val,
     );
@@ -142,6 +150,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
     ConvertMode convertMode,
     List<ImageDisplayCubit> cubits,
     int convertedImageQty,
+    Color? filledColor,
   });
 }
 
@@ -167,6 +176,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
     Object? convertMode = null,
     Object? cubits = null,
     Object? convertedImageQty = null,
+    Object? filledColor = freezed,
   }) {
     return _then(
       _$ConvertImagesStateImpl(
@@ -210,6 +220,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value.convertedImageQty
                 : convertedImageQty // ignore: cast_nullable_to_non_nullable
                     as int,
+        filledColor:
+            freezed == filledColor
+                ? _value.filledColor
+                : filledColor // ignore: cast_nullable_to_non_nullable
+                    as Color?,
       ),
     );
   }
@@ -229,6 +244,7 @@ class _$ConvertImagesStateImpl
     required this.convertMode,
     required final List<ImageDisplayCubit> cubits,
     required this.convertedImageQty,
+    required this.filledColor,
   }) : _images = images,
        _cubits = cubits;
 
@@ -260,10 +276,12 @@ class _$ConvertImagesStateImpl
 
   @override
   final int convertedImageQty;
+  @override
+  final Color? filledColor;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, cubits: $cubits, convertedImageQty: $convertedImageQty)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, cubits: $cubits, convertedImageQty: $convertedImageQty, filledColor: $filledColor)';
   }
 
   @override
@@ -283,7 +301,8 @@ class _$ConvertImagesStateImpl
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
       ..add(DiagnosticsProperty('convertMode', convertMode))
       ..add(DiagnosticsProperty('cubits', cubits))
-      ..add(DiagnosticsProperty('convertedImageQty', convertedImageQty));
+      ..add(DiagnosticsProperty('convertedImageQty', convertedImageQty))
+      ..add(DiagnosticsProperty('filledColor', filledColor));
   }
 
   @override
@@ -307,7 +326,9 @@ class _$ConvertImagesStateImpl
                 other.convertMode == convertMode) &&
             const DeepCollectionEquality().equals(other._cubits, _cubits) &&
             (identical(other.convertedImageQty, convertedImageQty) ||
-                other.convertedImageQty == convertedImageQty));
+                other.convertedImageQty == convertedImageQty) &&
+            (identical(other.filledColor, filledColor) ||
+                other.filledColor == filledColor));
   }
 
   @override
@@ -321,6 +342,7 @@ class _$ConvertImagesStateImpl
     convertMode,
     const DeepCollectionEquality().hash(_cubits),
     convertedImageQty,
+    filledColor,
   );
 
   /// Create a copy of ConvertImagesState
@@ -345,6 +367,7 @@ abstract class _ConvertImagesState implements ConvertImagesState {
     required final ConvertMode convertMode,
     required final List<ImageDisplayCubit> cubits,
     required final int convertedImageQty,
+    required final Color? filledColor,
   }) = _$ConvertImagesStateImpl;
 
   @override
@@ -363,6 +386,8 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   List<ImageDisplayCubit> get cubits;
   @override
   int get convertedImageQty;
+  @override
+  Color? get filledColor;
 
   /// Create a copy of ConvertImagesState
   /// with the given fields replaced by the non-null parameter values.

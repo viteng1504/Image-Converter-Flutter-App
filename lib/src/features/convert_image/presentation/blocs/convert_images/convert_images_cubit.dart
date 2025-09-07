@@ -2,6 +2,7 @@
 import 'dart:io';
 
 // Flutter imports:
+import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Package imports:
@@ -13,6 +14,7 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Project imports:
 import '../../../../../core/enums/convert.dart';
+import '../../../../../core/resources/app_colors.dart';
 import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
 import '../../../domain/entities/saved_file.dart';
@@ -37,11 +39,12 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     required ConvertMode convertMode,
     required int compressAmount,
     required bool isGrayScale,
+    required Color? filledColor,
   }) {
     if (convertMode == ConvertMode.pdf) {
       convertMode = ConvertMode.jpg;
     }
-    return "i${index}_m${convertMode.name}_ca${compressAmount}_gr$isGrayScale";
+    return "i${index}_m${convertMode.name}_ca${compressAmount}_gr${isGrayScale}_c$filledColor";
   }
 
   //create cubit list for each image
@@ -60,6 +63,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         convertMode: state.convertMode,
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
+        filledColor: state.filledColor,
       );
       final cubit = ImageDisplayCubit(convertImageUsecase);
 
@@ -70,6 +74,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         compressAmount: state.compressAmount,
         isGrayScale: state.isGrayScale,
         convertMode: state.convertMode,
+        filledColor: state.filledColor,
       );
 
       cachedImages[key] = convertedImage;
@@ -105,16 +110,19 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     ConvertMode? convertMode,
     bool? isGrayScale,
     int? compressAmount,
+    Color? filledColor,
   }) async {
     ConvertMode newConvertMode = convertMode ?? state.convertMode;
     final newIsGrayScale = isGrayScale ?? state.isGrayScale;
     final newCompressAmount = compressAmount ?? state.compressAmount;
+    final newFilledColor = filledColor ?? state.filledColor;
 
     emit(
       state.copyWith(
         convertMode: newConvertMode,
         isGrayScale: newIsGrayScale,
         compressAmount: newCompressAmount,
+        filledColor: newFilledColor,
       ),
     );
 
@@ -137,6 +145,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         convertMode: newConvertMode,
         compressAmount: newCompressAmount,
         isGrayScale: newIsGrayScale,
+        filledColor: newFilledColor,
       );
 
       if (cachedImages.containsKey(key)) {
@@ -154,6 +163,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
           compressAmount: newCompressAmount,
           isGrayScale: newIsGrayScale,
           convertMode: newConvertMode,
+          filledColor: newFilledColor,
         );
 
         cachedImages[key] = convertedImage;
@@ -162,7 +172,8 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         // check if state is changed to prevent emit old state
         if (state.isGrayScale == newIsGrayScale &&
             state.convertMode == newConvertMode &&
-            state.compressAmount == newCompressAmount) {
+            state.compressAmount == newCompressAmount &&
+            state.filledColor == newFilledColor) {
           cubit.updateImageUI(convertedImage);
         }
       });
@@ -171,6 +182,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
   //
   void onSelectConvertMode(ConvertMode convertMode) {
+    emit(state.copyWith(filledColor: null));
     onImageConversionOptionChanged(convertMode: convertMode);
   }
 
@@ -182,13 +194,15 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   // isGrayScale checked
   void onGrayScalePressed() {
     onImageConversionOptionChanged(isGrayScale: !state.isGrayScale);
-    print(
-      "grayScale ______________________________________________________${state.isGrayScale}",
-    );
+  }
+
+  // filled transparency color changed
+  void onFilledColorChanged(Color? filledColor) {
+    onImageConversionOptionChanged(filledColor: filledColor);
   }
 
   //get Storage path
-  Future<String> getStoragePath(ConvertFile convertFile) async {
+  Future<String> getDefaultStoragePath(ConvertFile convertFile) async {
     final Directory? externalDir = await getExternalStorageDirectory();
 
     if (externalDir == null) {
@@ -207,6 +221,54 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     return convertPath;
   }
 
+  //get select store path
+  Future<String?> getSelectStoragePath(BuildContext context) async {
+    try {
+      // Lấy root path TRƯỚC, chưa đụng context
+      final appDocsDir = await getApplicationDocumentsDirectory();
+      final rootDir = Directory(appDocsDir.path);
+
+      // Đảm bảo thư mục tồn tại
+      if (!await rootDir.exists()) {
+        await rootDir.create(recursive: true);
+      }
+
+      // Check mounted NGAY trước khi dùng context
+      if (!context.mounted) return null;
+
+      final path = await FilesystemPicker.open(
+        title: 'Select Folder',
+        context: context,
+        rootDirectory: rootDir,
+        fsType: FilesystemType.folder,
+        pickText: 'Select this folder',
+        folderIconColor: AppColors.fontGray,
+        requestPermission: () async => true,
+
+        // Hiện nút "New folder"
+        contextActions: [FilesystemPickerNewFolderContextAction()],
+
+        // Tránh “đen trên đen”: dùng màu từ theme hiện tại
+        theme: FilesystemPickerTheme(
+          topBar: FilesystemPickerTopBarThemeData(
+            backgroundColor: Colors.teal,
+            titleTextStyle: const TextStyle(color: AppColors.white),
+          ),
+          backgroundColor: AppColors.white,
+          fileList: FilesystemPickerFileListThemeData(
+            // folderTextStyle: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+
+      debugPrint('getSelectStoragePath => $path');
+      return path;
+    } catch (e, s) {
+      debugPrint('getSelectStoragePath error: $e\n$s');
+      return null;
+    }
+  }
+
   //check if image name exist or not
 
   String getExtensionFromConvertMode(ConvertMode mode) {
@@ -223,7 +285,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   // convert to pdf
-  Future<SavedFile> convertToPdf(String basePdfName) async {
+  Future<SavedFile> convertToPdf(String basePdfName, String storagePath) async {
     Uint8List firstImage = state.cubits[0].state.image!;
 
     final PdfDocument document = PdfDocument();
@@ -255,7 +317,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     final List<int> bytes = await document.save();
     document.dispose();
 
-    final downloadDir = Directory('/storage/emulated/0/Download/pdf files');
+    final downloadDir = Directory(storagePath);
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
@@ -282,11 +344,56 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     );
   }
 
-  Future<void> onConvertToFile(BuildContext context, String basePdfName) async {
-    emit(state.copyWith(isConvertingToFiles: true));
+  Future<StorePathChose> showPathSelectDialog(BuildContext context) async {
+    StorePathChose? result = await showDialog<StorePathChose>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: AppColors.background,
+          content: const Text(
+            "Do you want to use Default Path or your Select Path?",
+            style: TextStyle(color: AppColors.white),
+          ),
 
+          title: const Text(
+            'Choose Storage Path',
+            style: TextStyle(color: AppColors.primary),
+          ),
+          actions: [
+            TextButton(
+              onPressed:
+                  () => Navigator.pop(context, StorePathChose.defaultPath),
+              child: const Text(
+                'Default Path',
+                style: TextStyle(color: AppColors.primary),
+              ),
+            ),
+            TextButton(
+              onPressed:
+                  () => Navigator.pop(context, StorePathChose.selectPath),
+              child: const Text(
+                'Select Path',
+                style: TextStyle(color: AppColors.primary),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    return result ?? StorePathChose.none;
+  }
+
+  Future<void> onConvertToFile(BuildContext context, String basePdfName) async {
+    //choose path
+    final storePathChose = await showPathSelectDialog(context);
+    if (storePathChose == StorePathChose.none) return;
+    print(
+      "_________________cubit______________convert to file_______________storepath$storePathChose",
+    );
     final List<SavedFile> savedFiles = [];
 
+    //check if any image is converting and wait
     while (convertingImageKeys.isNotEmpty) {
       await Future.delayed(const Duration(milliseconds: 2000));
       if (convertingImageKeys.isEmpty) {
@@ -303,10 +410,31 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       ConvertMode.pdf => ConvertFile.pdf,
     };
 
-    String storagePath = await getStoragePath(convertFile);
+    String? storagePath;
+
+    switch (storePathChose) {
+      case StorePathChose.selectPath:
+        if (!context.mounted) return;
+        storagePath = await getSelectStoragePath(context);
+        break;
+
+      case StorePathChose.defaultPath:
+        storagePath = await getDefaultStoragePath(convertFile);
+        break;
+
+      case StorePathChose.none:
+        storagePath = null;
+        break;
+    }
+
+    if (storagePath == null) return;
+    emit(state.copyWith(isConvertingToFiles: true));
 
     if (convertFile == ConvertFile.pdf) {
-      final pdfSavedFile = await convertToPdf(basePdfName);
+      if (storePathChose == StorePathChose.defaultPath) {
+        storagePath = "/storage/emulated/0/Download/pdf files";
+      }
+      final pdfSavedFile = await convertToPdf(basePdfName, storagePath);
       savedFiles.add(pdfSavedFile);
     } else {
       //convert to image
@@ -322,12 +450,15 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         await dir.create(recursive: true);
       }
 
+      print(storagePath);
+
       for (int i = 0; i < state.cubits.length; i++) {
         final imageKey = buildImageKeyMap(
           index: i,
           convertMode: state.convertMode,
           compressAmount: state.compressAmount,
           isGrayScale: state.isGrayScale,
+          filledColor: state.filledColor,
         );
         final image = cachedImages[imageKey];
 

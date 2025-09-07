@@ -232,6 +232,11 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                             onChangedTextField: (value) {
                               _controller.text = value;
                             },
+                            onFillTransparencyColor:
+                                context
+                                    .read<ConvertImagesCubit>()
+                                    .onFilledColorChanged,
+                            filledColor: state.filledColor,
                           ),
 
                           Center(

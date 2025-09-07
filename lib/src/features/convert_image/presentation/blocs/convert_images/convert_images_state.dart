@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 // Package imports:
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -21,6 +22,7 @@ class ConvertImagesState with _$ConvertImagesState {
     required ConvertMode convertMode,
     required List<ImageDisplayCubit> cubits,
     required int convertedImageQty,
+    required Color? filledColor,
   }) = _ConvertImagesState;
 
   factory ConvertImagesState.initial() {
@@ -33,6 +35,7 @@ class ConvertImagesState with _$ConvertImagesState {
       cubits: [],
       isConvertingToFiles: false,
       convertedImageQty: 0,
+      filledColor: null
     );
   }
 }
