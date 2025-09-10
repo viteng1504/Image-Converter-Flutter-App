@@ -1,8 +1,18 @@
+// Dart imports:
+import 'dart:io';
 import 'dart:math' as math;
 
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Package imports:
+import 'package:open_file/open_file.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+// Project imports:
 import '../../../../core/resources/app_assets.dart';
+import '../../../convert_image/domain/entities/saved_file.dart';
 
 class SavedFilesScreen extends StatefulWidget {
   const SavedFilesScreen({super.key});
@@ -26,6 +36,10 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
   ];
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final List<SavedFile> savedFiles = args["savedFiles"];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -70,9 +84,9 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                 ),
                 const SizedBox(width: 16),
                 //title-result
-                const Text(
-                  "1 File Saved, 0 Skipped",
-                  style: TextStyle(
+                Text(
+                  "${savedFiles.length} File Saved, 0 Skipped",
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -89,7 +103,12 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () async {
+                final url = Uri.parse(
+                  'https://play.google.com/store/apps/details?id=com.psoffritti.compress.video',
+                );
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -111,74 +130,94 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                 ],
               ),
             ),
-            SizedBox(height: 14),
-            SizedBox(
-              height: 480,
+            const SizedBox(height: 14),
+            Expanded(
+              // height: 480,
               child: ListView.builder(
+                itemCount: savedFiles.length,
+
                 itemBuilder: (context, index) {
+                  final savedFile = savedFiles[index];
                   return Padding(
                     padding: EdgeInsets.only(bottom: index != 9 ? 8.0 : 0.0),
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(8),
-                              topRight: Radius.circular(8),
+                        InkWell(
+                          onTap: () async {
+                            final result = await OpenFile.open(savedFile.path);
+                            if (result.type != ResultType.done) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Không mở được file'),
+                                ),
+                              );
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.3),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(8),
+                                topRight: Radius.circular(8),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(8),
+                            child: Row(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(8),
+                                  ),
+                                  child: Image.memory(
+                                    savedFile.image,
+                                    width: 120,
+                                    height: 130,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                child: Image.asset(
-                                  AppImages.image,
-                                  width: 120,
-                                  height: 130,
-                                  fit: BoxFit.cover,
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        savedFile.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        savedFile.size,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        savedFile.path,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Image ${index + 1}",
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "120 kB",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  const Text(
-                                    "/storage/....",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white12,
                             borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(8),
@@ -189,27 +228,119 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.open_in_new,
                                   color: Colors.white,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final result = await OpenFile.open(
+                                    savedFile.path,
+                                  );
+                                  if (result.type != ResultType.done) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Không mở được file'),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
                               IconButton(
-                                icon: Icon(Icons.save_as, color: Colors.white),
+                                icon: const Icon(
+                                  Icons.save_as,
+                                  color: Colors.white,
+                                ),
                                 onPressed: () {},
                               ),
                               IconButton(
                                 icon: Transform(
                                   alignment: Alignment.center,
                                   transform: Matrix4.rotationY(math.pi),
-                                  child: Icon(Icons.reply, color: Colors.white),
+                                  child: const Icon(
+                                    Icons.reply,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final params = ShareParams(
+                                    files: [XFile(savedFile.path)],
+                                  );
+                                  await SharePlus.instance.share(params);
+                                },
                               ),
                               IconButton(
-                                icon: Icon(Icons.delete, color: Colors.white),
-                                onPressed: () {},
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        backgroundColor: const Color.fromARGB(
+                                          255,
+                                          28,
+                                          26,
+                                          26,
+                                        ),
+                                        title: const Column(
+                                          children: [
+                                            Icon(
+                                              Icons.delete,
+                                              color: AppColors.primary,
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: const Text(
+                                          'Are you sure you want to delete this file?',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: const Text(
+                                              'Cancel',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                          TextButton(
+                                            onPressed: () async {
+                                              Navigator.of(context).pop();
+                                              final file = File(savedFile.path);
+                                              if (await file.exists()) {
+                                                await file.delete();
+                                              }
+
+                                              setState(() {
+                                                savedFiles.removeAt(index);
+                                              });
+                                            },
+                                            child: const Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
                               ),
                             ],
                           ),
@@ -218,11 +349,13 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                     ),
                   );
                 },
-                itemCount: 10,
               ),
             ),
-            SizedBox(height: 14),
-            Expanded(
+            const SizedBox(height: 14),
+
+            //bottom options
+            SizedBox(
+              height: 100,
               child: GridView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -237,14 +370,159 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                     borderRadius: BorderRadius.circular(20),
                     splashColor: Colors.blue.withOpacity(0.2),
                     highlightColor: Colors.blue.withOpacity(0.2),
-                    onTap: () {},
+                    onTap: () async {
+                      if (index == 0) {
+                      } else if (index == 1) {
+                        final paragrams = ShareParams(
+                          files: savedFiles.map((e) => XFile(e.path)).toList(),
+                        );
+                        await SharePlus.instance.share(paragrams);
+                      } else if (index == 2) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              backgroundColor: const Color.fromARGB(
+                                255,
+                                28,
+                                26,
+                                26,
+                              ),
+                              title: const Column(
+                                children: [
+                                  Icon(Icons.delete, color: AppColors.primary),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Delete All',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: const Text(
+                                'Are you sure you want to delete all these files?',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text(
+                                    'Cancel',
+                                    style: TextStyle(color: AppColors.primary),
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(context).pop();
+                                    for (var file in savedFiles) {
+                                      final f = File(file.path);
+                                      if (await f.exists()) {
+                                        await f.delete();
+                                      }
+                                    }
+                                    setState(() {
+                                      savedFiles.clear();
+                                    });
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(color: AppColors.primary),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else if (index == 3) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Text(
+                                      'Rate this app',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    const Text(
+                                      textAlign: TextAlign.center,
+                                      'You like this app? Then take a little bit of your time to leave a rating',
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: List.generate(
+                                        5,
+                                        (index) => GestureDetector(
+                                          onTap: () async {
+                                            if (index == 4) {
+                                              final url = Uri.parse(
+                                                'https://play.google.com/store/apps/details?id=com.psoffritti.convertimage',
+                                              );
+                                              await launchUrl(
+                                                url,
+                                                mode:
+                                                    LaunchMode
+                                                        .externalApplication,
+                                              );
+                                            } else {
+                                              Navigator.pop(context);
+                                            }
+                                          },
+                                          child: const Icon(
+                                            Icons.star_border,
+                                            size: 40,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    Align(
+                                      alignment: Alignment.centerRight,
+                                      child: TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.orange,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: const EdgeInsets.only(left: 24.0),
                         child: Row(
                           spacing: 16,
                           mainAxisAlignment: MainAxisAlignment.start,

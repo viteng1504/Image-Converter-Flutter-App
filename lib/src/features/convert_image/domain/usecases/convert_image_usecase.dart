@@ -6,54 +6,44 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 // Project imports:
-import '../../../../core/device_info.dart';
 import '../../../../core/enums/convert.dart';
-import '../../domain/entities/original_image.dart';
-import '../../domain/entities/saved_file.dart';
-import '../../domain/repositories/images_repository.dart';
-import '../data_sources/local/convert_api.dart';
+import '../entities/original_image.dart';
+import '../entities/saved_file.dart';
+import '../repositories/images_repository.dart';
 
-class ImagesRepositoryImpl implements ImagesRepository {
-  final ConvertApi api;
+class ConvertImageUsecase {
+  ImagesRepository repo;
 
-  ImagesRepositoryImpl(this.api);
+  ConvertImageUsecase(this.repo);
 
-  @override
-  Future<List<XFile>> selectImages() async {
-    final images = await api.selectImages();
-    return images;
-  }
-
-  @override
-  Future<List<OriginalImage>> encodeImages(List<XFile> images) async {
-    return await api.encodeImages(images, DeviceInfo.maxSize);
-  }
-
-  @override
   Future<Uint8List> convertImage({
     required OriginalImage originalImage,
     required int compressAmount,
     required bool isGrayScale,
     required ConvertMode convertMode,
     required Color? filledColor,
+
   }) async {
-    return await api.convertImageIsolate(
+    return await repo.convertImage(
       originalImage: originalImage,
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
-      filledColor: filledColor,
+      filledColor: filledColor
     );
   }
 
-  @override
+  Future<List<OriginalImage>> encodeImage(List<XFile> images) {
+    return repo.encodeImages(images);
+  }
+
   Future<SavedFile> convertToImage({
     required ConvertMode convertMode,
     required Uint8List image,
     required String imageName,
     required String storagePath,
   }) async {
-    return api.convertToImage(
+    return repo.convertToImage(
       convertMode: convertMode,
       image: image,
       imageName: imageName,

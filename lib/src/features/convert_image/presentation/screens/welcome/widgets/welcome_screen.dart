@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import '../../../../../../core/resources/app_colors.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -33,7 +35,7 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -41,16 +43,16 @@ class WelcomeScreen extends StatelessWidget {
                 headerText,
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
-                  fontSize: 48,
+                  fontSize: 40,
                   color: AppColors.white,
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 30),
               Text(
                 bodyText,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
                   color: AppColors.white,
                 ),
               ),

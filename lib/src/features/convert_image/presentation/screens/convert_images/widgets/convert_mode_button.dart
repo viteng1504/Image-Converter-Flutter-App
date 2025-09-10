@@ -1,5 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
 import '../../../../../../core/resources/app_assets.dart';
 
 class ConvertModeButton extends StatefulWidget {
@@ -31,7 +33,6 @@ class _ConvertModeButtonState extends State<ConvertModeButton> {
         child: InkWell(
           onTap: widget.onPressed,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             decoration: BoxDecoration(
               color: widget.isSelected ? AppColors.primary : null,
               border:

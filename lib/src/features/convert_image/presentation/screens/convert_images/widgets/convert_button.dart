@@ -1,6 +1,10 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:flutter_svg/svg.dart';
 
+// Project imports:
 import '../../../../../../core/resources/app_colors.dart';
 import '../../../../../../core/resources/app_icons.dart';
 
