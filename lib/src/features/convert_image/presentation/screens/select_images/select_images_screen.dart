@@ -10,7 +10,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // Project imports:
 import '../../../../../core/device_info.dart';
 import '../../../../../core/resources/app_assets.dart';
-import '../../../../../core/storages/local_storage.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
 import '../../../domain/usecases/select_image_usecase.dart';
@@ -58,82 +57,83 @@ class SelectImagesScreen extends StatelessWidget {
           }
         },
         builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: AppColors.background,
-              title: const Center(
-                child: Text(
-                  "Convert Image",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.white,
+          return SafeArea(
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: AppColors.background,
+                title: const Center(
+                  child: Text(
+                    "Convert Image",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.white,
+                    ),
                   ),
                 ),
               ),
-            ),
-
-            // Select Image button
-            floatingActionButton: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 20,
-                ),
-
-                backgroundColor: AppColors.primary,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(24)),
-                ),
-              ),
-              onPressed: () {
-                context.read<SelectImagesCubit>().onShowSnackBar(context);
-                LocalStorage.removeIsFirstLaunch();
-              },
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, color: AppColors.font, size: 30),
-                  SizedBox(width: 16),
-                  Text(
-                    "Select Images",
-                    style: TextStyle(fontSize: 16, color: AppColors.font),
+            
+              // Select Image button
+              floatingActionButton: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 20,
                   ),
-                ],
+            
+                  backgroundColor: AppColors.primary,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(24)),
+                  ),
+                ),
+                onPressed: () {
+                  context.read<SelectImagesCubit>().onSelectImages();
+                },
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, color: AppColors.font, size: 30),
+                    SizedBox(width: 16),
+                    Text(
+                      "Select Images",
+                      style: TextStyle(fontSize: 16, color: AppColors.font),
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            body: InkWell(
-              onTap: () {
-                context.read<SelectImagesCubit>().onSelectImages();
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(32),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        AppIcons.selectImage,
-                        width: 170,
-                        height: 170,
-                      ),
-                      const SizedBox(height: 24),
-                      const Text(
-                        "Select images",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.fontGray,
+            
+              body: InkWell(
+                onTap: () {
+                  context.read<SelectImagesCubit>().onSelectImages();
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          AppIcons.selectImage,
+                          width: 170,
+                          height: 170,
                         ),
-                      ),
-                      const Text(
-                        "or share them with the app",
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: AppColors.fontGray,
+                        const SizedBox(height: 24),
+                        const Text(
+                          "Select images",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.fontGray,
+                          ),
                         ),
-                      ),
-                    ],
+                        const Text(
+                          "or share them with the app",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: AppColors.fontGray,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
