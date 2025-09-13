@@ -5,6 +5,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 // Project imports:
 import '../../../../../core/resources/app_assets.dart';
+import '../../../../../core/storages/local_storage.dart';
 import 'widgets/welcome_screen.dart';
 
 class WelcomeMainScreen extends StatefulWidget {
@@ -48,7 +49,7 @@ class _WelcomeMainScreenState extends State<WelcomeMainScreen> {
     });
   }
 
-  void _onNextPage() {
+  void _onNextPage() async {
     if (_currentPageIndex < pages.length - 1) {
       _controller.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -56,7 +57,11 @@ class _WelcomeMainScreenState extends State<WelcomeMainScreen> {
       );
     } else if (_currentPageIndex == pages.length - 1) {
       print(123);
-      Navigator.pushReplacementNamed(context, "select_images");
+
+      //Make welcome screen show once
+      LocalStorage.setIsFirstLaunch();
+
+      Navigator.pushReplacementNamed(context, "/select_images");
     }
     // _currentPageIndex++;
   }

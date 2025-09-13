@@ -224,16 +224,15 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   //get select store path
   Future<String?> getSelectStoragePath(BuildContext context) async {
     try {
-      // Lấy root path TRƯỚC, chưa đụng context
+      // get root path
       final appDocsDir = await getApplicationDocumentsDirectory();
       final rootDir = Directory(appDocsDir.path);
 
-      // Đảm bảo thư mục tồn tại
+      // make sure path exists
       if (!await rootDir.exists()) {
         await rootDir.create(recursive: true);
       }
 
-      // Check mounted NGAY trước khi dùng context
       if (!context.mounted) return null;
 
       final path = await FilesystemPicker.open(
@@ -245,10 +244,9 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         folderIconColor: AppColors.fontGray,
         requestPermission: () async => true,
 
-        // Hiện nút "New folder"
+        // show New folder button
         contextActions: [FilesystemPickerNewFolderContextAction()],
 
-        // Tránh “đen trên đen”: dùng màu từ theme hiện tại
         theme: FilesystemPickerTheme(
           topBar: FilesystemPickerTopBarThemeData(
             backgroundColor: Colors.teal,
@@ -270,7 +268,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   //check if image name exist or not
-
   String getExtensionFromConvertMode(ConvertMode mode) {
     switch (mode) {
       case ConvertMode.jpg:

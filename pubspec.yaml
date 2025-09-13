@@ -53,6 +53,7 @@ dependencies:
   media_scanner: ^2.2.0
   flutter_image_compress: ^2.4.0
   image_size_getter: ^2.4.0
+
   #converttopdf
   syncfusion_flutter_pdf: ^30.1.42
   open_file: ^3.5.10
@@ -67,6 +68,9 @@ dependencies:
 
   #file
   filesystem_picker: ^4.1.0
+
+  #local storage
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

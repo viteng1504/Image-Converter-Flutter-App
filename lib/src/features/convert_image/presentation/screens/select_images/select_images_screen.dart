@@ -4,13 +4,13 @@ import 'dart:ui';
 
 // Flutter imports:
 import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Project imports:
 import '../../../../../core/device_info.dart';
 import '../../../../../core/resources/app_assets.dart';
+import '../../../../../core/storages/local_storage.dart';
 import '../../../data/data_sources/local/convert_api.dart';
 import '../../../data/repositories/images_repository_impl.dart';
 import '../../../domain/usecases/select_image_usecase.dart';
@@ -72,6 +72,8 @@ class SelectImagesScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            // Select Image button
             floatingActionButton: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
@@ -86,6 +88,7 @@ class SelectImagesScreen extends StatelessWidget {
               ),
               onPressed: () {
                 context.read<SelectImagesCubit>().onShowSnackBar(context);
+                LocalStorage.removeIsFirstLaunch();
               },
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
