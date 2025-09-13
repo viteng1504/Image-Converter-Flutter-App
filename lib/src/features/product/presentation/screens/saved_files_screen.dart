@@ -4,7 +4,6 @@ import 'dart:math' as math;
 
 // Flutter imports:
 import 'package:flutter/material.dart';
-
 // Package imports:
 import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
@@ -441,35 +440,47 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                       } else if (index == 3) {
                         showDialog(
                           context: context,
+
                           builder: (context) {
                             return Dialog(
+                              backgroundColor: AppColors.sliderInactiveTrack,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(20),
                                 child: Column(
+                                  spacing: 14,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     const Text(
                                       'Rate this app',
                                       style: TextStyle(
+                                        color: AppColors.white,
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    const SizedBox(height: 20),
+                                    Image.asset(
+                                      AppIcons.app,
+                                      width: 60,
+                                      height: 60,
+                                    ),
                                     const Text(
                                       textAlign: TextAlign.center,
                                       'You like this app? Then take a little bit of your time to leave a rating',
-                                      style: TextStyle(fontSize: 16),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: AppColors.white,
+                                      ),
                                     ),
-                                    const SizedBox(height: 20),
                                     Row(
+                                      spacing: 10,
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: List.generate(
                                         5,
+
                                         (index) => GestureDetector(
                                           onTap: () async {
                                             if (index == 4) {
@@ -489,25 +500,24 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                           child: const Icon(
                                             Icons.star_border,
                                             size: 40,
-                                            color: Colors.orange,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(height: 20),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text(
-                                          'OK',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.orange,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
+                                    // Align(
+                                    //   alignment: Alignment.centerRight,
+                                    //   child: TextButton(
+                                    //     onPressed: () => Navigator.pop(context),
+                                    //     child: const Text(
+                                    //       'OK',
+                                    //       style: TextStyle(
+                                    //         fontSize: 16,
+                                    //         color: AppColors.primary,
+                                    //       ),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
