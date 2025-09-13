@@ -202,23 +202,35 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   //get Storage path
+
   Future<String> getDefaultStoragePath(ConvertFile convertFile) async {
-    final Directory? externalDir = await getExternalStorageDirectory();
+    if (Platform.isAndroid) {
+      final Directory? externalDir = await getExternalStorageDirectory();
 
-    if (externalDir == null) {
-      throw Exception("Cannot access external storage");
+      if (externalDir == null) {
+        throw Exception("Can not access external storage");
+      }
+
+      final String path = externalDir.path.split("/Android")[0];
+
+      final convertPath = switch (convertFile) {
+        ConvertFile.image => "$path/Pictures",
+        ConvertFile.pdf => "$path/Download",
+      };
+
+      return convertPath;
+    } else if (Platform.isIOS) {
+      final iosDir = await getApplicationDocumentsDirectory();
+
+      final convertPath = switch (convertFile) {
+        ConvertFile.image => "${iosDir.path}/Images",
+        ConvertFile.pdf => "${iosDir.path}/PDFs",
+      };
+
+      return convertPath;
+    } else {
+      throw UnsupportedError("Unsupported platform");
     }
-
-    final String path = externalDir.path.split("/Android")[0];
-
-    final convertPath = switch (convertFile) {
-      ConvertFile.image => "$path/Pictures",
-      ConvertFile.pdf => "$path/Download",
-    };
-
-    print(convertPath);
-
-    return convertPath;
   }
 
   //get select store path
