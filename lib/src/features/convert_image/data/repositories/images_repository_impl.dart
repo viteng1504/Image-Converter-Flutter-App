@@ -60,4 +60,17 @@ class ImagesRepositoryImpl implements ImagesRepository {
       storagePath: storagePath,
     );
   }
+
+  @override
+  Future<SavedFile> convertToPdf({
+    required String basePdfName,
+    required String storagePath,
+    required List<Uint8List> images,
+  }) async {
+    return api.convertToPdf(
+      basePdfName: basePdfName,
+      storagePath: storagePath,
+      images: images,
+    );
+  }
 }

@@ -26,4 +26,10 @@ abstract class ImagesRepository {
     required String imageName,
     required String storagePath,
   });
+
+  Future<SavedFile> convertToPdf({
+    required String basePdfName,
+    required String storagePath,
+    required List<Uint8List> images,
+  });
 }

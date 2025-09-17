@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:path/path.dart' as path;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Project imports:
 import '../../../../../core/device_info.dart';
@@ -265,6 +266,68 @@ class ConvertApi {
       name: map["imageName"]!,
       size: Utils.formatSize(image.length),
       path: imagePath,
+    );
+  }
+
+  // convert to pdf
+  Future<SavedFile> convertToPdf({
+    required String basePdfName,
+    required String storagePath,
+    required List<Uint8List> images,
+  }) async {
+    Uint8List firstImage = images[0];
+
+    final PdfDocument document = PdfDocument();
+    for (final image in images) {
+      final PdfImage pdfImage = PdfBitmap(image);
+
+      final page = document.pages.add();
+      final originalWidth = pdfImage.width;
+      final originalHeight = pdfImage.height;
+
+      final double widthRatio = page.getClientSize().width / originalWidth;
+      final double heightRatio = page.getClientSize().height / originalHeight;
+      final double scale = widthRatio < heightRatio ? widthRatio : heightRatio;
+
+      final double imageWidth = originalWidth * scale;
+      final double imageHeight = originalHeight * scale;
+
+      final double x = (page.getClientSize().width - imageWidth) / 2;
+      final double y = (page.getClientSize().height - imageHeight) / 2;
+
+      page.graphics.drawImage(
+        pdfImage,
+        Rect.fromLTWH(x, y, imageWidth, imageHeight),
+      );
+    }
+
+    final List<int> bytes = await document.save();
+    document.dispose();
+
+    final downloadDir = Directory(storagePath);
+    if (!await downloadDir.exists()) {
+      await downloadDir.create(recursive: true);
+    }
+
+    // Tạo tên file ngẫu nhiên và kiểm tra trùng
+
+    String fileName = basePdfName;
+    int count = 1;
+    while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
+      fileName = '$basePdfName($count)';
+      count++;
+    }
+
+    final file = File('${downloadDir.path}/$fileName.pdf');
+
+    print("convert to pdf ${bytes.length}");
+    await file.writeAsBytes(bytes);
+
+    return SavedFile(
+      image: firstImage,
+      name: "$fileName.pdf",
+      size: Utils.formatSize(bytes.length),
+      path: "${downloadDir.path}/$fileName.pdf",
     );
   }
 }

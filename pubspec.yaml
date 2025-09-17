@@ -69,8 +69,12 @@ dependencies:
   #file
   filesystem_picker: ^4.1.0
 
+  #permission
+  permission_handler: ^12.0.1
+
   #local storage
   shared_preferences: ^2.5.3
+  external_path: ^2.2.0
 
 dev_dependencies:
   flutter_test:

@@ -1,20 +1,17 @@
 // Dart imports:
 import 'dart:io';
 
-// Flutter imports:
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // Package imports:
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Project imports:
 import '../../../../../core/enums/convert.dart';
 import '../../../../../core/resources/app_colors.dart';
+import '../../../../../core/storages/local_storage.dart';
 import '../../../../../core/utils/utils.dart';
 import '../../../domain/entities/original_image.dart';
 import '../../../domain/entities/saved_file.dart';
@@ -201,159 +198,23 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     onImageConversionOptionChanged(filledColor: filledColor);
   }
 
-  //get Storage path
-
-  Future<String> getDefaultStoragePath(ConvertFile convertFile) async {
-    if (Platform.isAndroid) {
-      final Directory? externalDir = await getExternalStorageDirectory();
-
-      if (externalDir == null) {
-        throw Exception("Can not access external storage");
-      }
-
-      final String path = externalDir.path.split("/Android")[0];
-
-      final convertPath = switch (convertFile) {
-        ConvertFile.image => "$path/Pictures",
-        ConvertFile.pdf => "$path/Download",
-      };
-
-      return convertPath;
-    } else if (Platform.isIOS) {
-      final iosDir = await getApplicationDocumentsDirectory();
-
-      final convertPath = switch (convertFile) {
-        ConvertFile.image => "${iosDir.path}/Images",
-        ConvertFile.pdf => "${iosDir.path}/PDFs",
-      };
-
-      return convertPath;
-    } else {
-      throw UnsupportedError("Unsupported platform");
-    }
-  }
-
-  //get select store path
-  Future<String?> getSelectStoragePath(BuildContext context) async {
-    try {
-      // get root path
-      final appDocsDir = await getApplicationDocumentsDirectory();
-      final rootDir = Directory(appDocsDir.path);
-
-      // make sure path exists
-      if (!await rootDir.exists()) {
-        await rootDir.create(recursive: true);
-      }
-
-      if (!context.mounted) return null;
-
-      final path = await FilesystemPicker.open(
-        title: 'Select Folder',
-        context: context,
-        rootDirectory: rootDir,
-        fsType: FilesystemType.folder,
-        pickText: 'Select this folder',
-        folderIconColor: AppColors.fontGray,
-        requestPermission: () async => true,
-
-        // show New folder button
-        contextActions: [FilesystemPickerNewFolderContextAction()],
-
-        theme: FilesystemPickerTheme(
-          topBar: FilesystemPickerTopBarThemeData(
-            backgroundColor: Colors.teal,
-            titleTextStyle: const TextStyle(color: AppColors.white),
-          ),
-          backgroundColor: AppColors.white,
-          fileList: FilesystemPickerFileListThemeData(
-            // folderTextStyle: const TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-
-      debugPrint('getSelectStoragePath => $path');
-      return path;
-    } catch (e, s) {
-      debugPrint('getSelectStoragePath error: $e\n$s');
-      return null;
-    }
-  }
-
-  //check if image name exist or not
-  String getExtensionFromConvertMode(ConvertMode mode) {
-    switch (mode) {
-      case ConvertMode.jpg:
-        return 'jpg';
-      case ConvertMode.png:
-        return 'png';
-      case ConvertMode.webp:
-        return 'webp';
-      default:
-        return 'jpg';
-    }
-  }
-
   // convert to pdf
   Future<SavedFile> convertToPdf(String basePdfName, String storagePath) async {
-    Uint8List firstImage = state.cubits[0].state.image!;
+    final List<Uint8List> listImages =
+        state.cubits.map((cubit) => cubit.state.image!).toList();
 
-    final PdfDocument document = PdfDocument();
-    for (final cubit in state.cubits) {
-      final imageBytes = cubit.state.image;
-
-      final PdfImage image = PdfBitmap(imageBytes!);
-
-      final page = document.pages.add();
-      final originalWidth = image.width;
-      final originalHeight = image.height;
-
-      final double widthRatio = page.getClientSize().width / originalWidth;
-      final double heightRatio = page.getClientSize().height / originalHeight;
-      final double scale = widthRatio < heightRatio ? widthRatio : heightRatio;
-
-      final double imageWidth = originalWidth * scale;
-      final double imageHeight = originalHeight * scale;
-
-      final double x = (page.getClientSize().width - imageWidth) / 2;
-      final double y = (page.getClientSize().height - imageHeight) / 2;
-
-      page.graphics.drawImage(
-        image,
-        Rect.fromLTWH(x, y, imageWidth, imageHeight),
-      );
-    }
-
-    final List<int> bytes = await document.save();
-    document.dispose();
-
-    final downloadDir = Directory(storagePath);
-    if (!await downloadDir.exists()) {
-      await downloadDir.create(recursive: true);
-    }
-
-    // Tạo tên file ngẫu nhiên và kiểm tra trùng
-
-    String fileName = basePdfName;
-    int count = 1;
-    while (File('${downloadDir.path}/$fileName.pdf').existsSync()) {
-      fileName = '$basePdfName($count)';
-      count++;
-    }
-
-    final file = File('${downloadDir.path}/$fileName.pdf');
-
-    print("convert to pdf ${bytes.length}");
-    await file.writeAsBytes(bytes);
-
-    return SavedFile(
-      image: firstImage,
-      name: "$fileName.pdf",
-      size: Utils.formatSize(bytes.length),
-      path: "${downloadDir.path}/$fileName.pdf",
+    final savedFile = convertImageUsecase.convertToPdf(
+      basePdfName: basePdfName,
+      storagePath: storagePath,
+      images: listImages,
     );
+
+    return savedFile;
   }
 
   Future<StorePathChose> showPathSelectDialog(BuildContext context) async {
+    await LocalStorage.requestStoragePermission();
+
     StorePathChose? result = await showDialog<StorePathChose>(
       context: context,
       builder: (BuildContext context) {
@@ -404,7 +265,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
     //check if any image is converting and wait
     while (convertingImageKeys.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 2000));
       if (convertingImageKeys.isEmpty) {
         break;
       }
@@ -424,11 +284,11 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     switch (storePathChose) {
       case StorePathChose.selectPath:
         if (!context.mounted) return;
-        storagePath = await getSelectStoragePath(context);
+        storagePath = await LocalStorage.getSelectStoragePath(context);
         break;
 
       case StorePathChose.defaultPath:
-        storagePath = await getDefaultStoragePath(convertFile);
+        storagePath = await LocalStorage.getDefaultStoragePath(convertFile);
         break;
 
       case StorePathChose.none:
@@ -450,7 +310,9 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
       storagePath = path.join(
         storagePath,
-        "${getExtensionFromConvertMode(state.convertMode)} images",
+
+        //check if image name exist or not
+        "${Utils.getExtensionFromConvertMode(state.convertMode)} images",
       );
 
       // create store images path
@@ -496,13 +358,8 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       await Navigator.pushNamed(
         context,
         "/saved_files",
-        arguments: {
-          "savedFiles": savedFiles,
-          // "firstImage": firstImage,
-        },
+        arguments: {"savedFiles": savedFiles},
       );
     }
-
-    // return savedFiles;
   }
 }
