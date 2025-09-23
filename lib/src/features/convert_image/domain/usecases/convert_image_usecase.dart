@@ -22,14 +22,13 @@ class ConvertImageUsecase {
     required bool isGrayScale,
     required ConvertMode convertMode,
     required Color? filledColor,
-
   }) async {
     return await repo.convertImage(
       originalImage: originalImage,
       compressAmount: compressAmount,
       isGrayScale: isGrayScale,
       convertMode: convertMode,
-      filledColor: filledColor
+      filledColor: filledColor,
     );
   }
 
@@ -48,6 +47,18 @@ class ConvertImageUsecase {
       image: image,
       imageName: imageName,
       storagePath: storagePath,
+    );
+  }
+
+  Future<SavedFile> convertToPdf({
+    required String basePdfName,
+    required String storagePath,
+    required List<Uint8List> images,
+  }) async {
+    return repo.convertToPdf(
+      basePdfName: basePdfName,
+      storagePath: storagePath,
+      images: images,
     );
   }
 }
