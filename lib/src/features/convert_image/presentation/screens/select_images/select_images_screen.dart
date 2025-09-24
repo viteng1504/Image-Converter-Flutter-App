@@ -72,7 +72,7 @@ class SelectImagesScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            
+
               // Select Image button
               floatingActionButton: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -80,7 +80,7 @@ class SelectImagesScreen extends StatelessWidget {
                     horizontal: 24,
                     vertical: 20,
                   ),
-            
+
                   backgroundColor: AppColors.primary,
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(24)),
@@ -92,16 +92,16 @@ class SelectImagesScreen extends StatelessWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add, color: AppColors.font, size: 30),
+                    Icon(Icons.add, color: Colors.white, size: 30),
                     SizedBox(width: 16),
                     Text(
                       "Select Images",
-                      style: TextStyle(fontSize: 16, color: AppColors.font),
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ],
                 ),
               ),
-            
+
               body: InkWell(
                 onTap: () {
                   context.read<SelectImagesCubit>().onSelectImages();
