@@ -87,7 +87,10 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       i++;
     }
 
-    emit(state.copyWith(cubits: cubits, images: originalImages));
+    final order = List.generate(cubits.length, (index) => index);
+    print(order);
+
+    emit(state.copyWith(cubits: cubits, images: originalImages, order: order));
   }
 
   //convert to original images from xfiles
@@ -198,6 +201,11 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     onImageConversionOptionChanged(filledColor: filledColor);
   }
 
+  //reorder image
+  void onReOrderImages(List<int> order) {
+    emit(state.copyWith(order: order));
+  }
+
   // convert to pdf
   Future<SavedFile> convertToPdf(String basePdfName, String storagePath) async {
     final List<Uint8List> listImages =
@@ -212,7 +220,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     return savedFile;
   }
 
-  Future<StorePathChose> showPathSelectDialog(BuildContext context) async {
+  Future<StorePathChose> _showPathSelectDialog(BuildContext context) async {
     await LocalStorage.requestStoragePermission();
 
     StorePathChose? result = await showDialog<StorePathChose>(
@@ -256,12 +264,12 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
 
   Future<void> onConvertToFile(BuildContext context, String basePdfName) async {
     //choose path
-    final storePathChose = await showPathSelectDialog(context);
+    final storePathChose = await _showPathSelectDialog(context);
     if (storePathChose == StorePathChose.none) return;
     print(
       "_________________cubit______________convert to file_______________storepath$storePathChose",
     );
-    final List<SavedFile> savedFiles = [];
+    List<SavedFile> savedFiles = [];
 
     //check if any image is converting and wait
     while (convertingImageKeys.isNotEmpty) {
@@ -355,11 +363,33 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     if (state.isConvertingImageToBytes == false &&
         convertingImageKeys.isEmpty) {
       emit(state.copyWith(convertedImageQty: 0));
+
+      savedFiles = _onOrderChanged(savedFiles, convertMode);
       await Navigator.pushNamed(
         context,
         "/saved_files",
         arguments: {"savedFiles": savedFiles},
       );
     }
+  }
+
+  List<SavedFile> _onOrderChanged(
+    List<SavedFile> savedFiles,
+    ConvertMode convertMode,
+  ) {
+    final checkOrder = List.generate(state.cubits.length, (index) => index);
+    final isOrderChanged = checkOrder != state.order;
+    List<SavedFile> newSavedFilesList = [];
+
+    if (isOrderChanged && convertMode != ConvertMode.pdf) {
+      for (final order in state.order) {
+        final newSavedFile = savedFiles[order];
+        newSavedFilesList.add(newSavedFile);
+      }
+    } else {
+      return savedFiles;
+    }
+
+    return newSavedFilesList;
   }
 }

@@ -21,6 +21,7 @@ class ConvertImagesState with _$ConvertImagesState {
     required bool isGrayScale,
     required ConvertMode convertMode,
     required List<ImageDisplayCubit> cubits,
+    required List<int> order,
     required int convertedImageQty,
     required Color? filledColor,
   }) = _ConvertImagesState;
@@ -33,6 +34,7 @@ class ConvertImagesState with _$ConvertImagesState {
       isGrayScale: false,
       convertMode: ConvertMode.jpg,
       cubits: [],
+      order: [],
       isConvertingToFiles: false,
       convertedImageQty: 0,
       filledColor: null
