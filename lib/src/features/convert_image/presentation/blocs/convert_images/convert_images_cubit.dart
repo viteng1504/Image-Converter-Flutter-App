@@ -207,9 +207,16 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
   }
 
   // convert to pdf
-  Future<SavedFile> convertToPdf(String basePdfName, String storagePath) async {
-    final List<Uint8List> listImages =
-        state.cubits.map((cubit) => cubit.state.image!).toList();
+  Future<SavedFile> _convertToPdf(
+    String basePdfName,
+    String storagePath,
+  ) async {
+    // final List<Uint8List> listImages =
+    //     state.cubits.map((cubit) => cubit.state.image!).toList();
+    final List<Uint8List> listImages = [];
+    for (final order in state.order) {
+      listImages.add(state.cubits[order].state.image!);
+    }
 
     final savedFile = convertImageUsecase.convertToPdf(
       basePdfName: basePdfName,
@@ -311,7 +318,7 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       if (storePathChose == StorePathChose.defaultPath) {
         storagePath = "/storage/emulated/0/Download/pdf files";
       }
-      final pdfSavedFile = await convertToPdf(basePdfName, storagePath);
+      final pdfSavedFile = await _convertToPdf(basePdfName, storagePath);
       savedFiles.add(pdfSavedFile);
     } else {
       //convert to image
