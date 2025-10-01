@@ -8,7 +8,14 @@ import '../../../../../../core/resources/app_colors.dart';
 
 class ReorderableGridView extends StatefulWidget {
   final List<Uint8List?> imagesBytes;
-  const ReorderableGridView({super.key, required this.imagesBytes});
+  final List<int> order;
+  final Function(List<int>) onReOrderImages;
+  const ReorderableGridView({
+    super.key,
+    required this.imagesBytes,
+    required this.order,
+    required this.onReOrderImages,
+  });
 
   @override
   State<ReorderableGridView> createState() => _ReorderableGridViewState();
@@ -30,7 +37,7 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
   @override
   void initState() {
     super.initState();
-    order = List.generate(widget.imagesBytes.length, (index) => index);
+    order = List<int>.from(widget.order);
   }
 
   @override
@@ -42,6 +49,9 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
   void reorder(int from, int to) {
     final item = order.removeAt(from);
     order.insert(to, item);
+
+    //reorder image when dispose
+    widget.onReOrderImages(order);
   }
 
   @override
@@ -82,14 +92,15 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
                 height: itemHeight,
                 duration: const Duration(milliseconds: 100),
                 child: DragTarget<int>(
-                  onWillAccept: (from) {
-                    if (from == null || from == itemIndex) return false;
-                    setState(() {
-                      reorder(order.indexOf(from), index);
-                    });
+                  onWillAcceptWithDetails: (from) {
+                    if (from == itemIndex) return false;
+                    // setState(() {
+                    //   reorder(order.indexOf(from), index);
+                    // });
                     return true;
                   },
-                  onAccept: (_) => setState(() => draggingIndex = null),
+                  onAcceptWithDetails:
+                      (_) => setState(() => draggingIndex = null),
                   builder: (_, __, ___) {
                     return LongPressDraggable<int>(
                       data: itemIndex,
@@ -245,9 +256,9 @@ class _ReorderableGridViewState extends State<ReorderableGridView> {
                   ),
                 ),
                 Expanded(
-                  flex:1,
+                  flex: 1,
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Row(
                       children: [
                         Column(

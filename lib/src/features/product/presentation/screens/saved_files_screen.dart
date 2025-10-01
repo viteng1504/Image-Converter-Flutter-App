@@ -41,9 +41,9 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: Colors.black,
+          backgroundColor: AppColors.background,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {

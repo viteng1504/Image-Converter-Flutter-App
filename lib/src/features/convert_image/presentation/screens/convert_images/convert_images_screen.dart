@@ -88,19 +88,19 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                     ConvertImagesCubit(convertImageUsecase)
                       ..onConvertImages(widget.images),
           ),
-      
+
           BlocProvider(
             create: (context) => ImageDisplayCubit(convertImageUsecase),
           ),
         ],
-      
+
         child: BlocConsumer<ConvertImagesCubit, ConvertImagesState>(
           listener: (context, state) {},
           builder: (context, state) {
             final cubits = context.watch<ConvertImagesCubit>().state.cubits;
             final List<Uint8List?> imageBytesList =
                 cubits.map((cubit) => cubit.state.image).toList();
-      
+
             return context
                     .watch<ConvertImagesCubit>()
                     .state
@@ -148,7 +148,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                               state.convertMode == ConvertMode.pdf
                                   ? Expanded(
                                     child: ReorderableGridView(
+                                      order: state.order,
                                       imagesBytes: imageBytesList,
+                                      onReOrderImages: context.read<ConvertImagesCubit>().onReOrderImages,
                                     ),
                                   )
                                   : Expanded(
@@ -156,24 +158,32 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                       gridDelegate:
                                           SliverGridDelegateWithFixedCrossAxisCount(
                                             crossAxisCount:
-                                                widget.images.length == 1 ? 1 : 2,
+                                                widget.images.length == 1
+                                                    ? 1
+                                                    : 2,
                                             mainAxisSpacing: 16,
                                             crossAxisSpacing: 16,
                                             childAspectRatio: 0.9,
                                           ),
                                       itemCount: widget.images.length,
                                       itemBuilder: (context, index) {
+                                        final imageOrder = state.order[index];
+                                        final cubit = state.cubits[imageOrder];
+
                                         return BlocProvider.value(
-                                          value: cubits[index],
+                                          value: cubit,
                                           key: ValueKey(
                                             "${state.convertMode}_${state.compressAmount}_${state.isGrayScale}_$index",
                                           ),
-      
+
                                           child: BlocBuilder<
                                             ImageDisplayCubit,
                                             ImageDisplayState
                                           >(
-                                            builder: (imageContext, imageState) {
+                                            builder: (
+                                              imageContext,
+                                              imageState,
+                                            ) {
                                               return DisplayImage(
                                                 bytes: imageState.image,
                                                 size:
@@ -191,9 +201,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                       },
                                     ),
                                   ),
-      
+
                             const SizedBox(height: 20),
-      
+
                             const Text(
                               "Convert to",
                               style: TextStyle(
@@ -202,9 +212,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-      
+
                             const SizedBox(height: 16),
-      
+
                             //Select Convert Mode
                             ConvertModeBar(
                               convertMode: state.convertMode,
@@ -213,9 +223,9 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                       .read<ConvertImagesCubit>()
                                       .onSelectConvertMode,
                             ),
-      
+
                             const SizedBox(height: 16),
-      
+
                             // select mode
                             SelectMode(
                               onChangedEnd: (value) {
@@ -239,13 +249,16 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                       .onFilledColorChanged,
                               filledColor: state.filledColor,
                             ),
-      
+
                             Center(
                               child: ConvertButton(
                                 onPressed: () async {
                                   await context
                                       .read<ConvertImagesCubit>()
-                                      .onConvertToFile(context, _controller.text);
+                                      .onConvertToFile(
+                                        context,
+                                        _controller.text,
+                                      );
                                   // if (state.convertMode == ConvertMode.pdf) {
                                   //   final List<Uint8List> imageBytesList =
                                   //       state.images

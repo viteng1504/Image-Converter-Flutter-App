@@ -139,6 +139,7 @@ class ConvertApi {
 
       img.Image result = decoded;
 
+      // fill transparency color
       if (filledColor != null) {
         final bgR = filledColor.red; // int 0..255
         final bgG = filledColor.green; // int 0..255
@@ -183,6 +184,7 @@ class ConvertApi {
         result = out;
       }
 
+      // grayscale
       if (isGrayScale) {
         result = img.grayscale(result);
       }

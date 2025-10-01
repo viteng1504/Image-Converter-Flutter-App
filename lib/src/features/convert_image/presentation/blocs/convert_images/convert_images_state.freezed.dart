@@ -24,6 +24,7 @@ mixin _$ConvertImagesState {
   bool get isGrayScale => throw _privateConstructorUsedError;
   ConvertMode get convertMode => throw _privateConstructorUsedError;
   List<ImageDisplayCubit> get cubits => throw _privateConstructorUsedError;
+  List<int> get order => throw _privateConstructorUsedError;
   int get convertedImageQty => throw _privateConstructorUsedError;
   Color? get filledColor => throw _privateConstructorUsedError;
 
@@ -49,6 +50,7 @@ abstract class $ConvertImagesStateCopyWith<$Res> {
     bool isGrayScale,
     ConvertMode convertMode,
     List<ImageDisplayCubit> cubits,
+    List<int> order,
     int convertedImageQty,
     Color? filledColor,
   });
@@ -76,6 +78,7 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
     Object? isGrayScale = null,
     Object? convertMode = null,
     Object? cubits = null,
+    Object? order = null,
     Object? convertedImageQty = null,
     Object? filledColor = freezed,
   }) {
@@ -116,6 +119,11 @@ class _$ConvertImagesStateCopyWithImpl<$Res, $Val extends ConvertImagesState>
                     ? _value.cubits
                     : cubits // ignore: cast_nullable_to_non_nullable
                         as List<ImageDisplayCubit>,
+            order:
+                null == order
+                    ? _value.order
+                    : order // ignore: cast_nullable_to_non_nullable
+                        as List<int>,
             convertedImageQty:
                 null == convertedImageQty
                     ? _value.convertedImageQty
@@ -149,6 +157,7 @@ abstract class _$$ConvertImagesStateImplCopyWith<$Res>
     bool isGrayScale,
     ConvertMode convertMode,
     List<ImageDisplayCubit> cubits,
+    List<int> order,
     int convertedImageQty,
     Color? filledColor,
   });
@@ -175,6 +184,7 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
     Object? isGrayScale = null,
     Object? convertMode = null,
     Object? cubits = null,
+    Object? order = null,
     Object? convertedImageQty = null,
     Object? filledColor = freezed,
   }) {
@@ -215,6 +225,11 @@ class __$$ConvertImagesStateImplCopyWithImpl<$Res>
                 ? _value._cubits
                 : cubits // ignore: cast_nullable_to_non_nullable
                     as List<ImageDisplayCubit>,
+        order:
+            null == order
+                ? _value._order
+                : order // ignore: cast_nullable_to_non_nullable
+                    as List<int>,
         convertedImageQty:
             null == convertedImageQty
                 ? _value.convertedImageQty
@@ -243,10 +258,12 @@ class _$ConvertImagesStateImpl
     required this.isGrayScale,
     required this.convertMode,
     required final List<ImageDisplayCubit> cubits,
+    required final List<int> order,
     required this.convertedImageQty,
     required this.filledColor,
   }) : _images = images,
-       _cubits = cubits;
+       _cubits = cubits,
+       _order = order;
 
   @override
   final bool isConvertingImageToBytes;
@@ -274,6 +291,14 @@ class _$ConvertImagesStateImpl
     return EqualUnmodifiableListView(_cubits);
   }
 
+  final List<int> _order;
+  @override
+  List<int> get order {
+    if (_order is EqualUnmodifiableListView) return _order;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_order);
+  }
+
   @override
   final int convertedImageQty;
   @override
@@ -281,7 +306,7 @@ class _$ConvertImagesStateImpl
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, cubits: $cubits, convertedImageQty: $convertedImageQty, filledColor: $filledColor)';
+    return 'ConvertImagesState(isConvertingImageToBytes: $isConvertingImageToBytes, isConvertingToFiles: $isConvertingToFiles, images: $images, compressAmount: $compressAmount, isGrayScale: $isGrayScale, convertMode: $convertMode, cubits: $cubits, order: $order, convertedImageQty: $convertedImageQty, filledColor: $filledColor)';
   }
 
   @override
@@ -301,6 +326,7 @@ class _$ConvertImagesStateImpl
       ..add(DiagnosticsProperty('isGrayScale', isGrayScale))
       ..add(DiagnosticsProperty('convertMode', convertMode))
       ..add(DiagnosticsProperty('cubits', cubits))
+      ..add(DiagnosticsProperty('order', order))
       ..add(DiagnosticsProperty('convertedImageQty', convertedImageQty))
       ..add(DiagnosticsProperty('filledColor', filledColor));
   }
@@ -325,6 +351,7 @@ class _$ConvertImagesStateImpl
             (identical(other.convertMode, convertMode) ||
                 other.convertMode == convertMode) &&
             const DeepCollectionEquality().equals(other._cubits, _cubits) &&
+            const DeepCollectionEquality().equals(other._order, _order) &&
             (identical(other.convertedImageQty, convertedImageQty) ||
                 other.convertedImageQty == convertedImageQty) &&
             (identical(other.filledColor, filledColor) ||
@@ -341,6 +368,7 @@ class _$ConvertImagesStateImpl
     isGrayScale,
     convertMode,
     const DeepCollectionEquality().hash(_cubits),
+    const DeepCollectionEquality().hash(_order),
     convertedImageQty,
     filledColor,
   );
@@ -366,6 +394,7 @@ abstract class _ConvertImagesState implements ConvertImagesState {
     required final bool isGrayScale,
     required final ConvertMode convertMode,
     required final List<ImageDisplayCubit> cubits,
+    required final List<int> order,
     required final int convertedImageQty,
     required final Color? filledColor,
   }) = _$ConvertImagesStateImpl;
@@ -384,6 +413,8 @@ abstract class _ConvertImagesState implements ConvertImagesState {
   ConvertMode get convertMode;
   @override
   List<ImageDisplayCubit> get cubits;
+  @override
+  List<int> get order;
   @override
   int get convertedImageQty;
   @override
