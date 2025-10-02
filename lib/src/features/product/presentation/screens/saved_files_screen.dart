@@ -95,42 +95,6 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                 ],
               ),
               const SizedBox(height: 18),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-                onPressed: () async {
-                  final url = Uri.parse(
-                    'https://play.google.com/store/apps/details?id=com.psoffritti.compress.video',
-                  );
-                  await launchUrl(url, mode: LaunchMode.externalApplication);
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      AppIcons.compress,
-                      width: 45,
-                      height: 45,
-                      color: Colors.black,
-                    ),
-                    const Text(
-                      "Compress Videos",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
               Expanded(
                 // height: 480,
                 child: ListView.builder(
@@ -479,10 +443,14 @@ class _SavedFilesScreenState extends State<SavedFilesScreen> {
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                      Image.asset(
-                                        AppIcons.app,
-                                        width: 60,
-                                        height: 60,
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                                        child: Image.asset(
+                                          AppImages.app,
+                                          width: 60,
+                                          height: 60,
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                       const Text(
                                         textAlign: TextAlign.center,
