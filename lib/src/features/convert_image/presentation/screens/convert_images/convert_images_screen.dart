@@ -150,7 +150,10 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                                     child: ReorderableGridView(
                                       order: state.order,
                                       imagesBytes: imageBytesList,
-                                      onReOrderImages: context.read<ConvertImagesCubit>().onReOrderImages,
+                                      onReOrderImages:
+                                          context
+                                              .read<ConvertImagesCubit>()
+                                              .onReOrderImages,
                                     ),
                                   )
                                   : Expanded(
@@ -219,65 +222,62 @@ class _ConvertImagesScreenState extends State<ConvertImagesScreen> {
                             ConvertModeBar(
                               convertMode: state.convertMode,
                               onPressed:
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onSelectConvertMode,
+                                  state.isConvertingToFiles
+                                      ? null
+                                      : context
+                                          .read<ConvertImagesCubit>()
+                                          .onSelectConvertMode,
+                              isConvertingToFiles: state.isConvertingToFiles,
                             ),
 
                             const SizedBox(height: 16),
 
                             // select mode
                             SelectMode(
-                              onChangedEnd: (value) {
-                                context
-                                    .read<ConvertImagesCubit>()
-                                    .onCompressionAmountChanged(value.toInt());
-                              },
+                              onChangedEnd:
+                                  state.isConvertingToFiles
+                                      ? null
+                                      : (value) {
+                                        context
+                                            .read<ConvertImagesCubit>()
+                                            .onCompressionAmountChanged(
+                                              value.toInt(),
+                                            );
+                                      },
                               isGrayScaleChecked: state.isGrayScale,
                               onChecked:
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onGrayScalePressed,
+                                  state.isConvertingToFiles
+                                      ? null
+                                      : context
+                                          .read<ConvertImagesCubit>()
+                                          .onGrayScalePressed,
                               convertMode: state.convertMode,
                               controller: _controller,
                               onChangedTextField: (value) {
                                 _controller.text = value;
                               },
                               onFillTransparencyColor:
-                                  context
-                                      .read<ConvertImagesCubit>()
-                                      .onFilledColorChanged,
+                                  state.isConvertingToFiles
+                                      ? null
+                                      : context
+                                          .read<ConvertImagesCubit>()
+                                          .onFilledColorChanged,
                               filledColor: state.filledColor,
                             ),
 
                             Center(
                               child: ConvertButton(
-                                onPressed: () async {
-                                  await context
-                                      .read<ConvertImagesCubit>()
-                                      .onConvertToFile(
-                                        context,
-                                        _controller.text,
-                                      );
-                                  // if (state.convertMode == ConvertMode.pdf) {
-                                  //   final List<Uint8List> imageBytesList =
-                                  //       state.images
-                                  //           .map((image) => image.bytes)
-                                  //           .toList();
-                                  //   Uint8List firstImage = imageBytesList[0];
-                                  //   final file = await Convert().convertImageToPdf(
-                                  //     imageBytesList,
-                                  //   );
-                                  // }
-                                  // Navigator.pushNamed(
-                                  //   context,
-                                  //   "/saved_files",
-                                  //   arguments: {
-                                  //     "savedFiles": savedFiles,
-                                  //     // "firstImage": firstImage,
-                                  //   },
-                                  // );
-                                },
+                                onPressed:
+                                    state.isConvertingToFiles
+                                        ? null
+                                        : () async {
+                                          await context
+                                              .read<ConvertImagesCubit>()
+                                              .onConvertToFile(
+                                                context,
+                                                _controller.text,
+                                              );
+                                        },
                               ),
                             ),
                           ],

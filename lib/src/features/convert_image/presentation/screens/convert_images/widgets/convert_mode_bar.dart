@@ -8,11 +8,13 @@ import 'convert_mode_button.dart';
 
 class ConvertModeBar extends StatefulWidget {
   final ConvertMode convertMode;
-  final Function(ConvertMode) onPressed;
+  final Function(ConvertMode)? onPressed;
+  final bool isConvertingToFiles;
   const ConvertModeBar({
     super.key,
     required this.convertMode,
     required this.onPressed,
+    required this.isConvertingToFiles,
   });
 
   @override
@@ -20,65 +22,63 @@ class ConvertModeBar extends StatefulWidget {
 }
 
 class _ConvertModeBarState extends State<ConvertModeBar> {
+  Widget _buildModeButton({
+    required String label,
+    required ConvertMode mode,
+    required bool isSelected,
+    required bool isFirst,
+  }) {
+    return ConvertModeButton(
+      onPressed:
+          widget.isConvertingToFiles
+              ? null
+              : () {
+                if (!isSelected) {
+                  widget.onPressed?.call(mode);
+                }
+              },
+      label: label,
+      isSelected: isSelected,
+      isFirst: isFirst,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isJpgSelected = widget.convertMode == ConvertMode.jpg;
-    bool isPngSelected = widget.convertMode == ConvertMode.png;
-    bool isWebpSelected = widget.convertMode == ConvertMode.webp;
-    bool isPdfSelected = widget.convertMode == ConvertMode.pdf;
+    final modes = [
+      {"label": "JPG", "mode": ConvertMode.jpg},
+      {"label": "PNG", "mode": ConvertMode.png},
+      {"label": "WEBP", "mode": ConvertMode.webp},
+      {"label": "PDF", "mode": ConvertMode.pdf},
+    ];
 
     return Container(
       height: 50,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: AppColors.primary, width: 2),
+        border: Border.all(
+          color:
+              widget.isConvertingToFiles
+                  ? AppColors.fontGray
+                  : AppColors.primary,
+          width: 2,
+        ),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
         child: Row(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            ConvertModeButton(
-              onPressed: () {
-                if (!isJpgSelected) {
-                  widget.onPressed(ConvertMode.jpg);
-                }
-              },
-              label: "JPG",
-              isSelected: isJpgSelected,
-              isFirst: true,
-            ),
-            ConvertModeButton(
-              onPressed: () {
-                if (!isPngSelected) {
-                  widget.onPressed(ConvertMode.png);
-                }
-              },
-              label: "PNG",
-              isSelected: isPngSelected,
-              isFirst: false,
-            ),
-            ConvertModeButton(
-              onPressed: () {
-                if (!isWebpSelected) {
-                  widget.onPressed(ConvertMode.webp);
-                }
-              },
-              label: "WEBP",
-              isSelected: isWebpSelected,
-              isFirst: false,
-            ),
-            ConvertModeButton(
-              onPressed: () {
-                if (!isPdfSelected) {
-                  widget.onPressed(ConvertMode.pdf);
-                }
-              },
-              label: "PDF",
-              isSelected: isPdfSelected,
-              isFirst: false,
-            ),
-          ],
+          children: List.generate(modes.length, (index) {
+            final label = modes[index]["label"] as String;
+            final mode = modes[index]["mode"] as ConvertMode;
+            final isSelected = widget.convertMode == mode;
+            return _buildModeButton(
+              label: label,
+              mode: mode,
+              isSelected: isSelected,
+              isFirst: index == 0,
+            );
+          }),
         ),
       ),
     );

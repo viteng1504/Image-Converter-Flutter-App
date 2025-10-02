@@ -9,10 +9,10 @@ import '../../../../../../core/resources/app_assets.dart';
 enum Mode { compress, other }
 
 class SelectMode extends StatefulWidget {
-  final Function(double) onChangedEnd;
+  final Function(double)? onChangedEnd;
   final Function(String) onChangedTextField;
-  final VoidCallback onChecked;
-  final Function(Color?) onFillTransparencyColor;
+  final VoidCallback? onChecked;
+  final Function(Color?)? onFillTransparencyColor;
   final Color? filledColor;
   final bool isGrayScaleChecked;
   final ConvertMode convertMode;
@@ -65,6 +65,9 @@ class _SelectModeState extends State<SelectMode> {
   }
 
   Widget _compressTab() {
+    final Color sliderColor =
+        widget.onChangedEnd == null ? AppColors.fontGray : AppColors.primary;
+
     return SizedBox(
       height: 115,
       child: Column(
@@ -96,25 +99,29 @@ class _SelectModeState extends State<SelectMode> {
               ),
               Expanded(
                 child: SliderTheme(
-                  data: const SliderThemeData(
-                    padding: EdgeInsets.all(0),
+                  data: SliderThemeData(
+                    padding: const EdgeInsets.all(0),
                     trackHeight: 12,
-                    activeTrackColor: AppColors.primary,
+                    activeTrackColor: sliderColor,
                     inactiveTrackColor: AppColors.sliderInactiveTrack,
                     // trackHeight: 8,
-                    thumbColor: AppColors.primary,
+                    thumbColor: sliderColor,
                     // overlayColor: Color(0x557B9BFF),
-                    thumbShape: RoundSliderThumbShape(enabledThumbRadius: 14),
-                    trackShape: RoundedRectSliderTrackShape(),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 14,
+                    ),
+                    trackShape: const RoundedRectSliderTrackShape(),
                   ),
                   child: Slider(
                     value: sliderValue,
                     onChanged: (value) {
-                      setState(() {
-                        // widget.onChanged(value);
-                        // sliderChanged(value);
-                        sliderValue = value;
-                      });
+                      if (widget.onChangedEnd != null) {
+                        setState(() {
+                          // widget.onChanged(value);
+                          // sliderChanged(value);
+                          sliderValue = value;
+                        });
+                      }
                     },
                     onChangeEnd: widget.onChangedEnd,
                     min: 0,
@@ -157,7 +164,7 @@ class _SelectModeState extends State<SelectMode> {
                   if (!mounted) return;
                   setState(() {
                     pickerColor = result;
-                    widget.onFillTransparencyColor(result);
+                    widget.onFillTransparencyColor?.call(result);
                   });
                 },
                 child: Row(
@@ -256,7 +263,7 @@ class _SelectModeState extends State<SelectMode> {
               ),
           InkWell(
             onTap: () {
-              widget.onChecked();
+              widget.onChecked?.call();
             },
             child: Row(
               spacing: 20,
@@ -266,13 +273,15 @@ class _SelectModeState extends State<SelectMode> {
                   checkColor: AppColors.white,
                   fillColor: WidgetStateProperty.resolveWith<Color>((states) {
                     if (states.contains(WidgetState.selected)) {
-                      return AppColors.primary;
+                      return widget.onChecked == null
+                          ? AppColors.fontGray
+                          : AppColors.primary;
                     }
                     return Colors.transparent;
                   }),
                   value: widget.isGrayScaleChecked,
                   onChanged: (_) {
-                    widget.onChecked();
+                    widget.onChecked?.call();
                   },
                 ),
 

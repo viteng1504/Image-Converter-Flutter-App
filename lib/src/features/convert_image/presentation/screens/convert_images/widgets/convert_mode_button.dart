@@ -6,7 +6,7 @@ import '../../../../../../core/resources/app_assets.dart';
 
 class ConvertModeButton extends StatefulWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isSelected;
   final bool isFirst;
 
@@ -25,6 +25,8 @@ class ConvertModeButton extends StatefulWidget {
 class _ConvertModeButtonState extends State<ConvertModeButton> {
   @override
   Widget build(BuildContext context) {
+    final color =
+        widget.onPressed == null ? AppColors.fontGray : AppColors.primary;
     return Expanded(
       flex: 1,
       child: Material(
@@ -34,20 +36,18 @@ class _ConvertModeButtonState extends State<ConvertModeButton> {
           onTap: widget.onPressed,
           child: Container(
             decoration: BoxDecoration(
-              color: widget.isSelected ? AppColors.primary : null,
+              color: widget.isSelected ? color : null,
               border:
                   widget.isFirst
                       ? null
-                      : const Border(
-                        left: BorderSide(color: AppColors.primary, width: 2),
-                      ),
+                      : Border(left: BorderSide(color: color, width: 2)),
             ),
             child: Center(
               child: Text(
                 widget.label,
                 style: TextStyle(
                   fontSize: 16,
-                  color: widget.isSelected ? AppColors.font : AppColors.primary,
+                  color: widget.isSelected ? AppColors.font : color,
                 ),
               ),
             ),

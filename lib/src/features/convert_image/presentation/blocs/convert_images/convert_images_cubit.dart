@@ -278,12 +278,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     );
     List<SavedFile> savedFiles = [];
 
-    //check if any image is converting and wait
-    while (convertingImageKeys.isNotEmpty) {
-      if (convertingImageKeys.isEmpty) {
-        break;
-      }
-    }
     final convertMode = state.convertMode;
 
     //Check convert to image or pdf
@@ -314,6 +308,14 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
     if (storagePath == null) return;
     emit(state.copyWith(isConvertingToFiles: true));
 
+    //check if any image is converting and wait
+    while (convertingImageKeys.isNotEmpty) {
+      await Future.delayed(const Duration(seconds: 1));
+      if (convertingImageKeys.isEmpty) {
+        break;
+      }
+    }
+
     if (convertFile == ConvertFile.pdf) {
       if (storePathChose == StorePathChose.defaultPath) {
         storagePath = "/storage/emulated/0/Download/pdf files";
@@ -336,8 +338,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         await dir.create(recursive: true);
       }
 
-      print(storagePath);
-
       for (int i = 0; i < state.cubits.length; i++) {
         final imageKey = buildImageKeyMap(
           index: i,
@@ -351,7 +351,6 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
         final imageName = state.images[i].name;
 
         if (image != null) {
-          print(state.convertMode);
           final savedFile = await convertImageUsecase.convertToImage(
             convertMode: convertMode,
             image: image,
