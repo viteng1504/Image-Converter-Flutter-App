@@ -1,14 +1,12 @@
 import 'dart:io';
 
 import 'package:external_path/external_path.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:saf/saf.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../enums/convert.dart';
-import '../resources/app_assets.dart';
 
 class LocalStorage {
   static Future<void> setIsFirstLaunch() async {
@@ -31,20 +29,11 @@ class LocalStorage {
   //get Storage paths
   static Future<String> getDefaultStoragePath(ConvertFile convertFile) async {
     if (Platform.isAndroid) {
-      final Directory? externalDir = await getExternalStorageDirectory();
+      final externalDir = await ExternalPath.getExternalStoragePublicDirectory(
+        ExternalPath.DIRECTORY_DOWNLOAD,
+      );
 
-      if (externalDir == null) {
-        throw Exception("Can not access external storage");
-      }
-
-      final String path = externalDir.path.split("/Android")[0];
-
-      final convertPath = switch (convertFile) {
-        ConvertFile.image => "$path/Pictures",
-        ConvertFile.pdf => "$path/Download",
-      };
-
-      return convertPath;
+      return externalDir;
     } else if (Platform.isIOS) {
       final iosDir = await ExternalPath.getExternalStoragePublicDirectory(
         ExternalPath.DIRECTORY_DOCUMENTS,
@@ -64,46 +53,43 @@ class LocalStorage {
   //get select store path
   static Future<String?> getSelectStoragePath(BuildContext context) async {
     try {
-      // get root path
-      final externalPath = await ExternalPath.getExternalStorageDirectories();
-      if (externalPath == null || externalPath.isEmpty) {
+      String path = "";
+
+      bool? isGranted = await Saf.getDynamicDirectoryPermission();
+
+      if (isGranted != null && isGranted) {
+        List<String>? directories =
+            await Saf.getPersistedPermissionDirectories();
+
+        if (directories == null) {
+          print("Cant get directories");
+          return null;
+        }
+
+        //get external directories
+        final externalPath = await ExternalPath.getExternalStorageDirectories();
+
+        if (externalPath == null) {
+          print("Cant get any external storages");
+          return null;
+        }
+        //get external storage, not in SD card
+        final rootPath = externalPath.first;
+
+        String selectedDirectory = directories.last;
+        print(
+          "selectedDirectory:______________________________________________$selectedDirectory",
+        );
+
+        path = "$rootPath/$selectedDirectory";
+
+        print("FinalPath:______________________________________________$path");
+
+        Saf.releasePersistedPermissions();
+      } else {
+        print('User dont grant access SAF');
         return null;
       }
-
-      print(externalPath.toString());
-      final rootDir = Directory(externalPath.first);
-
-      // make sure path exists
-      if (!await rootDir.exists()) {
-        await rootDir.create(recursive: true);
-      }
-
-      if (!context.mounted) return null;
-
-      final path = await FilesystemPicker.open(
-        title: 'Select Folder',
-        context: context,
-        rootDirectory: rootDir,
-        // shortcuts: ,
-        fsType: FilesystemType.folder,
-        pickText: 'Select this folder',
-        folderIconColor: AppColors.fontGray,
-        requestPermission: () async => true,
-
-        // show New folder button
-        contextActions: [FilesystemPickerNewFolderContextAction()],
-
-        theme: FilesystemPickerTheme(
-          topBar: FilesystemPickerTopBarThemeData(
-            backgroundColor: AppColors.primary,
-            titleTextStyle: const TextStyle(color: AppColors.white),
-          ),
-          backgroundColor: AppColors.white,
-          fileList: FilesystemPickerFileListThemeData(
-            // folderTextStyle: const TextStyle(color: Colors.white),
-          ),
-        ),
-      );
 
       debugPrint('getSelectStoragePath => $path');
       return path;
@@ -116,19 +102,21 @@ class LocalStorage {
   // request permission
   static Future<void> requestStoragePermission() async {
     if (Platform.isAndroid) {
-      if (await Permission.manageExternalStorage.isGranted) {
+      if (await Permission.storage.isGranted) {
         return;
       }
 
-      if (await Permission.manageExternalStorage.isPermanentlyDenied) {
+      if (await Permission.storage.isPermanentlyDenied) {
         await openAppSettings();
         return;
       }
 
-      final status = await Permission.manageExternalStorage.request();
+      final status = await Permission.storage.request();
 
       if (status.isGranted) {
-        print('permission granted');
+        print(
+          'permission granted____________________________________________________________________________',
+        );
       } else {
         print('permission denied');
       }
