@@ -7,6 +7,7 @@ import 'package:saf/saf.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../enums/convert.dart';
+import '../resources/app_assets.dart';
 
 class LocalStorage {
   static Future<void> setIsFirstLaunch() async {
@@ -50,48 +51,75 @@ class LocalStorage {
     }
   }
 
+  //show invalid path snackbar
+  static void showPathErrorSnackbar(BuildContext context) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Can only choose 1 folder Download, Pictures or Documents.',
+            style: TextStyle(color: Colors.red, fontWeight: FontWeight.w700),
+          ),
+          backgroundColor: AppColors.sliderInactiveTrack,
+        ),
+      );
+    }
+  }
+
   //get select store path
+
   static Future<String?> getSelectStoragePath(BuildContext context) async {
     try {
+      //release permission
+      await Saf.releasePersistedPermissions();
+
       String path = "";
+      const List<String> allowedRootFolders = [
+        'Download',
+        'Pictures',
+        'Documents',
+      ];
+
+      //get external directories
+      final externalPath = await ExternalPath.getExternalStorageDirectories();
+
+      if (externalPath == null) {
+        debugPrint("Cant get any external storages");
+        return null;
+      }
+      //get external storage, not in SD card
+      final rootPath = externalPath.first;
 
       bool? isGranted = await Saf.getDynamicDirectoryPermission();
 
       if (isGranted != null && isGranted) {
-        List<String>? directories =
-            await Saf.getPersistedPermissionDirectories();
+        final directories = await Saf.getPersistedPermissionDirectories();
 
-        if (directories == null) {
-          print("Cant get directories");
+        if (directories!.isEmpty) {
+          debugPrint("Cant get directories");
           return null;
         }
-
-        //get external directories
-        final externalPath = await ExternalPath.getExternalStorageDirectories();
-
-        if (externalPath == null) {
-          print("Cant get any external storages");
-          return null;
-        }
-        //get external storage, not in SD card
-        final rootPath = externalPath.first;
 
         String selectedDirectory = directories.last;
-        print(
-          "selectedDirectory:______________________________________________$selectedDirectory",
+
+        bool isValidPath = allowedRootFolders.any(
+          (folder) => selectedDirectory.startsWith(folder),
         );
 
+        if (!isValidPath) {
+          showPathErrorSnackbar(context);
+
+          return null;
+        }
+
         path = "$rootPath/$selectedDirectory";
-
-        print("FinalPath:______________________________________________$path");
-
-        Saf.releasePersistedPermissions();
       } else {
-        print('User dont grant access SAF');
+        debugPrint('User dont grant access SAF');
         return null;
       }
 
       debugPrint('getSelectStoragePath => $path');
+
       return path;
     } catch (e, s) {
       debugPrint('getSelectStoragePath error: $e\n$s');

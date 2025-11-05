@@ -1,5 +1,5 @@
 // Flutter imports:
-import 'package:flutter/rendering.dart';
+import 'package:flutter/material.dart';
 
 class AppColors {
   static const Color white = Color(0xffffffff);
@@ -10,4 +10,5 @@ class AppColors {
   static const Color primary = Color.fromARGB(255, 59, 194, 162);
   static const Color font = Color(0xff2C2628);
   static const Color fontGray = Color(0xffC3C2C8);
+  static const Color error = Colors.red;
 }

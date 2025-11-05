@@ -235,9 +235,28 @@ class ConvertImagesCubit extends Cubit<ConvertImagesState> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          content: const Text(
-            "Do you want to use Default Path or your Select Path?",
-            style: TextStyle(color: AppColors.white),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Do you want to use Default Path or your Select Path?",
+                style: TextStyle(color: AppColors.white),
+              ),
+              const SizedBox(height: 8),
+
+              RichText(
+                text: const TextSpan(
+                  text: "Note: You can only select 3 root folders: ",
+                  style: TextStyle(fontWeight: FontWeight.w700),
+                  children: [
+                    TextSpan(
+                      text: "Download, Pictures, Documents",
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
 
           title: const Text(

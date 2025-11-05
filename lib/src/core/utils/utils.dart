@@ -1,12 +1,4 @@
-import 'dart:io';
-
-import 'package:external_path/external_path.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-
 import '../enums/convert.dart';
-import '../resources/app_assets.dart';
 
 class Utils {
   static String formatSize(int bytes) {
@@ -30,6 +22,4 @@ class Utils {
         return 'jpg';
     }
   }
-
-  
 }
