@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:external_path/external_path.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:saf/saf.dart';
@@ -70,7 +71,8 @@ class LocalStorage {
 
   static Future<String?> getSelectStoragePath(BuildContext context) async {
     try {
-      //release permission
+      if(Platform.isAndroid) {
+        //release permission
       await Saf.releasePersistedPermissions();
 
       String path = "";
@@ -121,6 +123,15 @@ class LocalStorage {
       debugPrint('getSelectStoragePath => $path');
 
       return path;
+      } else {
+        print(123);
+       String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+
+if (selectedDirectory == null) {
+  // User canceled the picker
+}
+
+      }
     } catch (e, s) {
       debugPrint('getSelectStoragePath error: $e\n$s');
       return null;

@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image_size_getter/image_size_getter.dart';
 import 'package:media_scanner/media_scanner.dart';
 import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 // Project imports:
@@ -261,7 +262,9 @@ class ConvertApi {
     //save image to file
     await File(imagePath).writeAsBytes(image);
 
-    await MediaScanner.loadMedia(path: imagePath);
+    if(Platform.isAndroid){
+      await MediaScanner.loadMedia(path: imagePath);
+    }
 
     return SavedFile(
       image: image,
@@ -269,6 +272,17 @@ class ConvertApi {
       size: Utils.formatSize(image.length),
       path: imagePath,
     );
+  }
+   Future<Directory> getPdfDirectory(String? storagePath) async {
+    if (Platform.isIOS) {
+      return await getApplicationDocumentsDirectory();
+    } else {
+      if (storagePath != null && storagePath.isNotEmpty) {
+        return Directory(storagePath);
+      }
+
+      return (await getExternalStorageDirectory())!;
+    }
   }
 
   // convert to pdf
@@ -305,9 +319,11 @@ class ConvertApi {
 
     final List<int> bytes = await document.save();
     document.dispose();
+    final Directory downloadDir = await getPdfDirectory(storagePath);
 
-    final downloadDir = Directory(storagePath);
+    // final downloadDir = Directory(storagePath);
     if (!await downloadDir.exists()) {
+      
       await downloadDir.create(recursive: true);
     }
 
